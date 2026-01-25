@@ -1,0 +1,79 @@
+"use client";
+
+import Sidebar from "@/components/Sidebar";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, PanelLeftOpen } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+export default function DashboardLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
+
+    return (
+        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+
+            {/* 1. SIDEBAR DESKTOP */}
+            <div
+                className={cn(
+                    "hidden md:flex h-screen w-64 flex-col fixed inset-y-0 z-40 transition-transform duration-300 ease-in-out",
+                    isDesktopSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                )}
+            >
+                {/* Pasamos la función onCollapse al Sidebar para que muestre el botón interno */}
+                <Sidebar onCollapse={() => setIsDesktopSidebarOpen(false)} />
+            </div>
+
+            {/* 2. HEADER MÓVIL */}
+            <div className="md:hidden fixed top-0 w-full z-50 bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between">
+                <span className="text-white font-bold text-lg">GOBIERNO<span className="text-blue-500">TECH</span></span>
+
+                <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                    <SheetTrigger asChild>
+                        <button className="text-white p-1">
+                            <Menu className="w-6 h-6" />
+                        </button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0 border-none w-64 bg-slate-900">
+                        <Sidebar onNavigate={() => setIsMobileOpen(false)} />
+                    </SheetContent>
+                </Sheet>
+            </div>
+
+            {/* 3. CONTENIDO PRINCIPAL */}
+            <main
+                className={cn(
+                    "flex-1 w-full transition-all duration-300 ease-in-out relative",
+                    "pt-20 md:pt-8", // Padding top
+                    isDesktopSidebarOpen ? "md:pl-64" : "md:pl-0" // Margen izquierdo dinámico
+                )}
+            >
+                {/* BOTÓN FLOTANTE (Solo visible cuando el Sidebar está CERRADO y en Desktop) */}
+                {!isDesktopSidebarOpen && (
+                    <Button
+                        variant="outline"
+                        // Quitamos size="icon" para poner medidas personalizadas más grandes
+                        onClick={() => setIsDesktopSidebarOpen(true)}
+                        className="hidden md:flex fixed top-6 left-6 z-50 
+                           h-12 w-12 rounded-full border-2 border-slate-200 bg-white 
+                           text-slate-600 shadow-xl transition-all duration-300
+                           hover:border-blue-500 hover:text-blue-600 hover:scale-110 hover:bg-white"
+                        title="Mostrar menú"
+                    >
+                        {/* Icono más grande (h-6 w-6 equivale a 24px) */}
+                        <PanelLeftOpen className="h-6 w-6" strokeWidth={2.5} />
+                    </Button>
+                )}
+
+                <div className="max-w-[1600px] mx-auto p-4 md:p-8">
+                    {children}
+                </div>
+            </main>
+        </div>
+    );
+}
