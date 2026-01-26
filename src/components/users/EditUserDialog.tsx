@@ -31,12 +31,10 @@ export function EditUserDialog({ open, onOpenChange, user, onSuccess }: EditUser
 
     useEffect(() => {
         if (open) {
-            // Cargar roles
+            // 1. Cargar roles (Esto ya lo tenías)
             api.get("/roles")
                 .then((res) => {
                     const allRoles = res.data;
-
-                    // 1. Lógica de seguridad visual
                     const userStr = localStorage.getItem('user');
                     const currentUser = userStr ? JSON.parse(userStr) : null;
                     const myRoleName = currentUser?.role?.name?.toLowerCase() || "";
@@ -46,18 +44,27 @@ export function EditUserDialog({ open, onOpenChange, user, onSuccess }: EditUser
                         const isDevRole = roleName.includes('dev');
                         const amIDev = myRoleName.includes('dev');
 
-                        if (isDevRole && !amIDev) {
-                            return false;
-                        }
+                        if (isDevRole && !amIDev) return false;
                         return true;
                     });
 
                     setRoles(visibleRoles);
                 })
                 .catch(console.error);
-        }
 
-        // ... Cargar datos del usuario a editar ...
+            // 2. CARGAR DATOS DEL USUARIO (¡ESTO FALTABA!) 👈
+            if (user) {
+                setFormData({
+                    name: user.name || "",
+                    email: user.email || "",
+                    password: "", // La contraseña se deja vacía siempre
+                    // Convertimos a string porque el Select espera string
+                    role_id: user.role_id ? user.role_id.toString() : "",
+                    // Convertimos true/1 a "1" y false/0 a "0"
+                    is_active: user.is_active ? "1" : "0"
+                });
+            }
+        }
     }, [open, user]);
 
     const handleSubmit = async () => {

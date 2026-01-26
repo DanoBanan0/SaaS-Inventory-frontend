@@ -10,10 +10,12 @@ import { ShieldCheck, Plus, Trash2, Pencil, Users } from "lucide-react";
 import Swal from "sweetalert2";
 import { CreateRoleDialog } from "@/components/roles/CreateRoleDialog";
 import { EditRoleDialog } from "@/components/roles/EditRoleDialog";
+import { DataFilters } from "@/components/common/DataFilters";
 
 export default function RolesPage() {
     const [roles, setRoles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
 
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -25,20 +27,15 @@ export default function RolesPage() {
             const res = await api.get("/roles");
             let data = res.data;
 
-            // --- LÓGICA DE SEGURIDAD VISUAL ---
-            // 1. Obtener mi role_id del localStorage
             const userStr = localStorage.getItem('user');
             const currentUser = userStr ? JSON.parse(userStr) : null;
             const myRoleId = currentUser?.role_id;
 
-            // 2. Buscar MI rol dentro de la lista que acabamos de descargar
             const myRoleObj = data.find((r: any) => r.id === myRoleId);
             const myRoleName = myRoleObj?.name?.toLowerCase() || "";
 
-            // 3. ¿Soy Developer?
             const amIDev = myRoleName.includes('dev') || myRoleName.includes('programador');
 
-            // 4. Si NO soy Developer, oculto los roles "Developer" de la tabla
             if (!amIDev) {
                 data = data.filter((r: any) => {
                     const rName = r.name.toLowerCase();
@@ -53,7 +50,7 @@ export default function RolesPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [search]);
 
     useEffect(() => {
         fetchRoles();
@@ -85,15 +82,17 @@ export default function RolesPage() {
         });
     };
 
+    const clearFilters = () => {
+        setSearch("");
+    };
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                         <ShieldCheck className="h-6 w-6 text-blue-600" />
-                        Roles y Permisos
+                        Roles
                     </h1>
-                    <p className="text-slate-500 text-sm">Define los niveles de acceso al sistema</p>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
                     <Plus className="mr-2 h-4 w-4" /> Nuevo Rol

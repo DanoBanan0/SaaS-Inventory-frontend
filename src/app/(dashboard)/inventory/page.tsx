@@ -43,9 +43,6 @@ export default function InventoryPage() {
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
                         Inventario General
                     </h1>
-                    <p className="text-slate-500 mt-1">
-                        Gestione sus activos por categoría
-                    </p>
                 </div>
 
                 {/* Botón que abre el Modal */}

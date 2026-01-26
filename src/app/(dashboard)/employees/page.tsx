@@ -11,27 +11,51 @@ import { Users, Plus, Search, Trash2, Pencil, Laptop, Briefcase } from "lucide-r
 import Swal from "sweetalert2";
 import { CreateEmployeeDialog } from "@/components/employees/CreateEmployeeDialog";
 import { EditEmployeeDialog } from "@/components/employees/EditEmployeeDialog";
+import { DataFilters } from "@/components/common/DataFilters";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function EmployeesPage() {
     const [employees, setEmployees] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+
     const [search, setSearch] = useState("");
+    const [unitFilter, setUnitFilter] = useState("");
+    const [units, setUnits] = useState<any[]>([]);
 
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedEmp, setSelectedEmp] = useState<any>(null);
 
+    useEffect(() => {
+        const fetchUnits = async () => {
+            try {
+                const res = await api.get("/units");
+                const list = Array.isArray(res.data) ? res.data : (res.data.data || []);
+                setUnits(list);
+            } catch (error) {
+                console.error("Error cargando unidades", error);
+                setUnits([]);
+            }
+        };
+        fetchUnits();
+    }, []);
+
     const fetchEmployees = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get(`/employees?search=${search}`);
+            const params = new URLSearchParams();
+            if (search) params.append("search", search);
+
+            if (unitFilter && unitFilter !== "all") params.append("unit_id", unitFilter);
+
+            const res = await api.get(`/employees?${params.toString()}`);
             setEmployees(res.data.data || res.data);
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
         }
-    }, [search]);
+    }, [search, unitFilter]);
 
     useEffect(() => {
         const timer = setTimeout(() => fetchEmployees(), 300);
@@ -64,6 +88,10 @@ export default function EmployeesPage() {
         });
     };
 
+    const clearFilters = () => {
+        setSearch("");
+    };
+
     return (
         <div className="space-y-6">
             {/* HEADER */}
@@ -73,7 +101,6 @@ export default function EmployeesPage() {
                         <Users className="h-6 w-6 text-blue-600" />
                         Directorio de Empleados
                     </h1>
-                    <p className="text-slate-500 text-sm">Gestión de personal y asignaciones</p>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
                     <Plus className="mr-2 h-4 w-4" /> Nuevo Empleado
@@ -81,19 +108,34 @@ export default function EmployeesPage() {
             </div>
 
             {/* BUSCADOR */}
-            <Card className="bg-slate-50 border-slate-200">
-                <CardContent className="p-4">
-                    <div className="relative max-w-md">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-                        <Input
-                            placeholder="Buscar por nombre, cargo o email..."
-                            className="pl-8 bg-white"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+            <DataFilters
+                searchValue={search}
+                onSearchChange={setSearch}
+                searchColSpan="md:col-span-3 lg:col-span-3"
+                clearColSpan="md:col-span-1"
+                hasActiveFilters={!!(search || unitFilter)}
+                onClear={clearFilters}
+            >
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Filtrar por Unidad</span>
+                    <Select
+                        value={unitFilter || "all"}
+                        onValueChange={(val) => setUnitFilter(val === "all" ? "" : val)}
+                    >
+                        <SelectTrigger className="bg-white w-full">
+                            <SelectValue placeholder="Todas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todas</SelectItem>
+                            {Array.isArray(units) && units.map((unit) => (
+                                <SelectItem key={unit.id} value={unit.id.toString()}>
+                                    {unit.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </DataFilters>
 
             {/* TABLA */}
             <Card>

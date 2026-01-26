@@ -7,10 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { UserCircle, Plus, Search, Trash2, Pencil, CheckCircle, Code, User, XCircle } from "lucide-react";
+import { UserCircle, Plus, Search, Ban, Pencil, CheckCircle, Code, User, XCircle, Unlock } from "lucide-react";
 import Swal from "sweetalert2";
 import { CreateUserDialog } from "@/components/users/CreateUserDialog";
 import { EditUserDialog } from "@/components/users/EditUserDialog";
+import { DataFilters } from "@/components/common/DataFilters";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<any[]>([]);
@@ -21,7 +22,6 @@ export default function UsersPage() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<any>(null);
 
-    // Obtener ID del usuario actual desde localStorage
     const getUserID = () => {
         if (typeof window !== 'undefined') {
             const userStr = localStorage.getItem('user');
@@ -37,27 +37,21 @@ export default function UsersPage() {
             const res = await api.get(`/users?search=${search}`);
             let data = res.data.data || res.data;
 
-            // --- FILTRADO INTELIGENTE ---
-            // 1. Me busco a mí mismo en la lista fresca
             const myId = getUserID();
             const me = data.find((u: any) => u.id === myId);
 
-            // 2. Determino mi rol real
             const myRoleName = me?.role?.name?.toLowerCase() || "";
             const amIDev = myRoleName.includes('dev') || myRoleName.includes('programador');
 
-            // 3. Aplico el filtro:
-            // Si el usuario objetivo es Developer, solo lo muestro si YO TAMBIÉN soy Developer.
             data = data.filter((targetUser: any) => {
                 const targetRoleName = targetUser.role?.name?.toLowerCase() || "";
                 const isTargetDev = targetRoleName.includes('dev') || targetRoleName.includes('programador');
 
                 if (isTargetDev) {
-                    return amIDev; // Solo true si soy dev
+                    return amIDev;
                 }
-                return true; // Los demás (Admin, User) los veo siempre
+                return true;
             });
-            // ----------------------------
 
             setUsers(data);
         } catch (error) {
@@ -76,22 +70,51 @@ export default function UsersPage() {
         setIsEditOpen(true);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDeactivate = (id: number) => {
         Swal.fire({
-            title: "¿Eliminar Usuario?",
-            text: "Este usuario perderá el acceso al sistema inmediatamente.",
+            title: "¿Desactivar Usuario?",
+            text: "El usuario perderá el acceso al sistema inmediatamente.",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            confirmButtonColor: "#d33"
+            confirmButtonText: "Sí, desactivar",
+            confirmButtonColor: "#d33",
+            cancelButtonText: "Cancelar"
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
                     await api.delete(`/users/${id}`);
-                    Swal.fire("Eliminado", "Usuario eliminado correctamente.", "success");
+                    Swal.fire("Desactivado", "Acceso revocado correctamente.", "success");
                     fetchUsers();
                 } catch (error: any) {
-                    Swal.fire("Acción Denegada", error.response?.data?.message || "Error desconocido", "error");
+                    Swal.fire("Error", error.response?.data?.message || "No se pudo desactivar", "error");
+                }
+            }
+        });
+    };
+
+    const handleActivate = (user: any) => {
+        Swal.fire({
+            title: "¿Reactivar Usuario?",
+            text: "El usuario podrá volver a iniciar sesión.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Sí, activar",
+            confirmButtonColor: "#10b981",
+            cancelButtonText: "Cancelar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await api.put(`/users/${user.id}`, {
+                        name: user.name,
+                        email: user.email,
+                        role_id: user.role_id,
+                        is_active: true
+                    });
+
+                    Swal.fire("Activado", "El usuario tiene acceso nuevamente.", "success");
+                    fetchUsers();
+                } catch (error: any) {
+                    Swal.fire("Error", error.response?.data?.message || "No se pudo activar", "error");
                 }
             }
         });
@@ -116,6 +139,9 @@ export default function UsersPage() {
             </Badge>
         );
     };
+    const clearFilters = () => {
+        setSearch("");
+    };
 
     return (
         <div className="space-y-6">
@@ -125,26 +151,19 @@ export default function UsersPage() {
                         <UserCircle className="h-6 w-6 text-blue-600" />
                         Usuarios del Sistema
                     </h1>
-                    <p className="text-slate-500 text-sm">Administración de cuentas y permisos</p>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
                     <Plus className="mr-2 h-4 w-4" /> Nuevo Usuario
                 </Button>
             </div>
 
-            <Card className="bg-slate-50 border-slate-200">
-                <CardContent className="p-4">
-                    <div className="relative max-w-md">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-                        <Input
-                            placeholder="Buscar por nombre o correo..."
-                            className="pl-8 bg-white"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+            {/* <DataFilters
+                searchValue={search}
+                onSearchChange={setSearch}
+                clearColSpan="md:col-span-1"
+                hasActiveFilters={!!search}
+                onClear={clearFilters}
+            /> */}
 
             <Card>
                 <CardContent className="p-0 overflow-x-auto">
@@ -187,13 +206,33 @@ export default function UsersPage() {
                                                 </div>
                                             )}
                                         </TableCell>
+
                                         <TableCell className="text-right space-x-1">
-                                            <Button variant="ghost" size="icon" onClick={() => handleEdit(user)}>
+                                            <Button variant="ghost" size="icon" onClick={() => handleEdit(user)} title="Editar">
                                                 <Pencil className="w-4 h-4 text-slate-400 hover:text-blue-600" />
                                             </Button>
-                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(user.id)}>
-                                                <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-600" />
-                                            </Button>
+
+                                            {user.is_active ? (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDeactivate(user.id)}
+                                                    title="Desactivar Acceso"
+                                                    className="text-slate-400 hover:text-red-600 hover:bg-red-50"
+                                                >
+                                                    <Ban className="w-4 h-4" />
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleActivate(user)}
+                                                    title="Reactivar Acceso"
+                                                    className="text-slate-400 hover:text-green-600 hover:bg-green-50"
+                                                >
+                                                    <Unlock className="w-4 h-4" />
+                                                </Button>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))

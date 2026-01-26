@@ -5,12 +5,12 @@ import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Plus, Search, Users, Trash2, Pencil } from "lucide-react"; // <--- Agregamos Pencil
+import { Building2, Plus, Users, Trash2, Pencil } from "lucide-react";
 import Swal from "sweetalert2";
 import { CreateUnitDialog } from "@/components/organization/CreateUnitDialog";
-import { EditUnitDialog } from "@/components/organization/EditUnitDialog"; // <--- Importamos el modal
+import { EditUnitDialog } from "@/components/organization/EditUnitDialog";
+import { DataFilters } from "@/components/common/DataFilters";
 
 export default function UnitsPage() {
     const [units, setUnits] = useState<any[]>([]);
@@ -19,8 +19,8 @@ export default function UnitsPage() {
 
     // Estados de Modales
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);       // <--- Nuevo estado
-    const [selectedUnit, setSelectedUnit] = useState<any>(null); // <--- Unidad seleccionada
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [selectedUnit, setSelectedUnit] = useState<any>(null);
 
     const fetchUnits = useCallback(async () => {
         setLoading(true);
@@ -69,6 +69,10 @@ export default function UnitsPage() {
         });
     };
 
+    const clearFilters = () => {
+        setSearch("");
+    };
+
     return (
         <div className="space-y-6">
             {/* HEADER */}
@@ -78,27 +82,20 @@ export default function UnitsPage() {
                         <Building2 className="h-6 w-6 text-blue-600" />
                         Unidades Organizativas
                     </h1>
-                    <p className="text-slate-500 text-sm">Departamentos y áreas de la empresa</p>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
                     <Plus className="mr-2 h-4 w-4" /> Nueva Unidad
                 </Button>
             </div>
 
-            {/* BUSCADOR */}
-            <Card className="bg-slate-50 border-slate-200">
-                <CardContent className="p-4">
-                    <div className="relative max-w-md">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-                        <Input
-                            placeholder="Buscar unidad..."
-                            className="pl-8 bg-white"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+            {/* BUSCADOR IMPLEMENTADO CON DATAFILTERS */}
+            <DataFilters
+                searchValue={search}
+                onSearchChange={setSearch}
+                clearColSpan="md:col-span-1"
+                hasActiveFilters={!!search}
+                onClear={clearFilters}
+            />
 
             {/* TABLA */}
             <Card>
@@ -129,13 +126,12 @@ export default function UnitsPage() {
                                             </Badge>
                                         </TableCell>
 
-                                        {/* Columna de Acciones Actualizada */}
                                         <TableCell className="text-right space-x-1">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 className="text-slate-400 hover:text-blue-600 hover:bg-blue-50"
-                                                onClick={() => handleEdit(unit)} // <--- Botón Editar
+                                                onClick={() => handleEdit(unit)}
                                             >
                                                 <Pencil className="w-4 h-4" />
                                             </Button>
@@ -163,7 +159,6 @@ export default function UnitsPage() {
                 onSuccess={fetchUnits}
             />
 
-            {/* Modal de Edición */}
             <EditUnitDialog
                 open={isEditOpen}
                 onOpenChange={setIsEditOpen}

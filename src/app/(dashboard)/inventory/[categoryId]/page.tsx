@@ -9,10 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, HardDrive, Calendar, Columns, Search, X, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, HardDrive, Columns, Pencil } from "lucide-react";
 import { CreateDeviceDialog } from "@/components/inventory/CreateDeviceDialog";
 import { AddColumnDialog } from "@/components/inventory/AddColumnDialog";
 import { EditDeviceDialog } from "@/components/inventory/EditDeviceDialog";
+import { DataFilters } from "@/components/common/DataFilters";
 
 export default function CategoryDetailPage() {
     const { categoryId } = useParams();
@@ -32,6 +33,8 @@ export default function CategoryDetailPage() {
     const [searchText, setSearchText] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [unitFilter, setUnitFilter] = useState("");
+    const [units, setUnits] = useState<any[]>([]);
+    const [dateFilter, setDateFilter] = useState(""); // Estado para la fecha
 
     const formatDate = (dateString: string) => {
         if (!dateString) return "-";
@@ -40,6 +43,7 @@ export default function CategoryDetailPage() {
         });
     };
 
+    // Carga de Datos Principal (Dispositivos)
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -54,6 +58,7 @@ export default function CategoryDetailPage() {
             if (searchText) params.append('search', searchText);
             if (statusFilter !== 'all') params.append('status', statusFilter);
             if (unitFilter) params.append('unit', unitFilter);
+            if (dateFilter) params.append('date', dateFilter); // Enviamos la fecha
 
             const devRes = await api.get(`/devices?${params.toString()}`);
             setDevices(devRes.data.data || devRes.data);
@@ -63,8 +68,9 @@ export default function CategoryDetailPage() {
         } finally {
             setLoading(false);
         }
-    }, [categoryId, searchText, statusFilter, unitFilter, category]);
+    }, [categoryId, searchText, statusFilter, unitFilter, dateFilter, category]);
 
+    // Efecto Debounce para recargar datos
     useEffect(() => {
         const timer = setTimeout(() => {
             if (categoryId) fetchData();
@@ -72,10 +78,26 @@ export default function CategoryDetailPage() {
         return () => clearTimeout(timer);
     }, [fetchData, categoryId]);
 
+    // Carga de Unidades para el Select
+    useEffect(() => {
+        const fetchUnits = async () => {
+            try {
+                const res = await api.get("/units");
+                const list = Array.isArray(res.data) ? res.data : (res.data.data || []);
+                setUnits(list);
+            } catch (error) {
+                console.error("Error cargando unidades:", error);
+                setUnits([]); 
+            }
+        };
+        fetchUnits();
+    }, []);
+
     const clearFilters = () => {
         setSearchText("");
         setStatusFilter("all");
         setUnitFilter("");
+        setDateFilter(""); // Limpiamos la fecha
     };
 
     const handleEditClick = (device: any) => {
@@ -88,7 +110,7 @@ export default function CategoryDetailPage() {
 
     return (
         <div className="space-y-6">
-            {/* 1. HEADER */}
+            {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" onClick={() => router.back()}>
@@ -99,7 +121,6 @@ export default function CategoryDetailPage() {
                             <HardDrive className="h-6 w-6 text-blue-600" />
                             {category?.name || "Cargando..."}
                         </h1>
-                        <p className="text-slate-500 text-sm">Gestión de dispositivos</p>
                     </div>
                 </div>
 
@@ -118,70 +139,62 @@ export default function CategoryDetailPage() {
                 </div>
             </div>
 
-            {/* 2. BARRA DE FILTROS (GRID RESPONSIVO) */}
-            <Card className="bg-slate-50 border-slate-200">
-                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            <DataFilters
+                searchValue={searchText}
+                onSearchChange={setSearchText}
+                searchColSpan="md:col-span-3 lg:col-span-3"
+                clearColSpan="md:col-span-1"
+                hasActiveFilters={!!(searchText || unitFilter || statusFilter !== 'all' || dateFilter)}
+                onClear={clearFilters}
+            >
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Filtrar por Unidad</span>
+                    <Select
+                        value={unitFilter || "all"}
+                        onValueChange={(val) => setUnitFilter(val === "all" ? "" : val)}
+                    >
+                        <SelectTrigger className="bg-white w-full">
+                            <SelectValue placeholder="Todas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todas</SelectItem>
+                            {Array.isArray(units) && units.map((unit) => (
+                                <SelectItem key={unit.id} value={unit.name}>
+                                    {unit.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
 
-                    {/* Buscador General (5 columnas) */}
-                    <div className="col-span-1 md:col-span-5 space-y-1">
-                        <span className="text-xs font-medium text-slate-500 ml-1">Búsqueda Inteligente</span>
-                        <div className="relative">
-                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-                            <Input
-                                placeholder="Serial, Modelo, Código, Empleado..."
-                                className="pl-8 bg-white"
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                            />
-                        </div>
-                    </div>
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Estado</span>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="bg-white w-full">
+                            <SelectValue placeholder="Todos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todos</SelectItem>
+                            <SelectItem value="available">🟢 Disponible</SelectItem>
+                            <SelectItem value="assigned">🔵 Asignado</SelectItem>
+                            <SelectItem value="maintenance">🟠 Mantenimiento</SelectItem>
+                            <SelectItem value="retired">🔴 Retirado</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
 
-                    {/* Filtro Unidad (3 columnas) */}
-                    <div className="col-span-1 md:col-span-3 space-y-1">
-                        <span className="text-xs font-medium text-slate-500 ml-1">Filtrar por Unidad</span>
-                        <Input
-                            placeholder="Ej: Informatica, Ventas..."
-                            className="bg-white"
-                            value={unitFilter}
-                            onChange={(e) => setUnitFilter(e.target.value)}
-                        />
-                    </div>
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Fecha Registro</span>
+                    <Input 
+                        type="date" 
+                        className="bg-white w-full"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                    />
+                </div>
+            </DataFilters>
 
-                    {/* Filtro Estado (3 columnas) */}
-                    <div className="col-span-1 md:col-span-3 space-y-1">
-                        <span className="text-xs font-medium text-slate-500 ml-1">Estado</span>
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="bg-white">
-                                <SelectValue placeholder="Todos" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Todos los estados</SelectItem>
-                                <SelectItem value="available">🟢 Disponible</SelectItem>
-                                <SelectItem value="assigned">🔵 Asignado</SelectItem>
-                                <SelectItem value="maintenance">🟠 Mantenimiento</SelectItem>
-                                <SelectItem value="retired">🔴 Retirado</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* Botón Limpiar (1 columna) */}
-                    <div className="col-span-1 md:col-span-1 flex justify-center md:justify-start">
-                        {(searchText || unitFilter || statusFilter !== 'all') && (
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={clearFilters}
-                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                title="Limpiar filtros"
-                            >
-                                <X className="h-5 w-5" />
-                            </Button>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* 3. TABLA DE DATOS (RESTAURADA) */}
+            {/* TABLA DE RESULTADOS */}
             <Card>
                 <CardContent className="p-0 overflow-x-auto">
                     <Table>
@@ -193,9 +206,8 @@ export default function CategoryDetailPage() {
                                 <TableHead className="font-bold text-slate-700">Marca</TableHead>
                                 <TableHead className="font-bold text-slate-700">Modelo</TableHead>
                                 <TableHead className="font-bold text-slate-700">Serial</TableHead>
-                                {/* CAMPOS DINÁMICOS */}
                                 {category?.fields?.map((field: any) => (
-                                    <TableHead key={field.key} className="text-blue-700 font-semibold">{field.label}</TableHead>
+                                    <TableHead key={field.key} className="font-bold text-slate-700">{field.label}</TableHead>
                                 ))}
                                 <TableHead className="font-bold text-slate-700">Estado</TableHead>
                                 <TableHead className="font-bold text-slate-700 w-[200px]">Comentario</TableHead>
@@ -222,9 +234,7 @@ export default function CategoryDetailPage() {
                                         <TableCell className="font-medium text-slate-900">
                                             {device.employee ? (
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold border border-blue-200">
-                                                        {device.employee.name.charAt(0)}
-                                                    </div>
+
                                                     <span className="whitespace-nowrap">{device.employee.name}</span>
                                                 </div>
                                             ) : (<span className="text-slate-400 text-xs italic">-- Sin Asignar --</span>)}
@@ -240,12 +250,14 @@ export default function CategoryDetailPage() {
                                         <TableCell>{device.brand}</TableCell>
                                         <TableCell>{device.model}</TableCell>
                                         <TableCell className="text-xs text-slate-500 font-mono uppercase">{device.serial_number}</TableCell>
+                                        
                                         {/* Celdas Dinámicas */}
                                         {category?.fields?.map((field: any) => (
                                             <TableCell key={field.key} className="text-slate-600">
                                                 {device.specs?.[field.key] || "-"}
                                             </TableCell>
                                         ))}
+                                        
                                         <TableCell>
                                             <Badge className={
                                                 device.status === 'available' ? 'bg-green-100 text-green-700 hover:bg-green-200' :

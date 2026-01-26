@@ -57,7 +57,7 @@ export default function LoginPage() {
             Swal.fire({
                 icon: "error",
                 title: "Acceso Denegado",
-                text: errorMsg,
+                text: "",
                 confirmButtonColor: "#1e40af", // blue-800
             });
         } finally {

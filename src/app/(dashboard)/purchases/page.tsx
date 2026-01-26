@@ -11,6 +11,7 @@ import { ShoppingCart, Plus, Search, Trash2, Pencil, Package, X, Calendar as Cal
 import Swal from "sweetalert2";
 import { CreatePurchaseDialog } from "@/components/purchases/CreatePurchaseDialog";
 import { EditPurchaseDialog } from "@/components/purchases/EditPurchaseDialog";
+import { DataFilters } from "@/components/common/DataFilters";
 
 export default function PurchasesPage() {
     const [purchases, setPurchases] = useState<any[]>([]);
@@ -95,7 +96,6 @@ export default function PurchasesPage() {
                         <ShoppingCart className="h-6 w-6 text-blue-600" />
                         Registro de Compras
                     </h1>
-                    <p className="text-slate-500 text-sm">Gestión de facturas y adquisiciones</p>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
                     <Plus className="mr-2 h-4 w-4" /> Registrar Factura
@@ -103,51 +103,26 @@ export default function PurchasesPage() {
             </div>
 
             {/* BARRA DE FILTROS (DISEÑO GRID) */}
-            <Card className="bg-slate-50 border-slate-200">
-                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-
-                    {/* 1. Buscador (Texto) - Ocupa más espacio */}
-                    <div className="col-span-1 md:col-span-6 space-y-1">
-                        <span className="text-xs font-medium text-slate-500 ml-1">Búsqueda</span>
-                        <div className="relative">
-                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-                            <Input
-                                placeholder="Proveedor, N° Factura..."
-                                className="pl-8 bg-white"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* 2. Filtro de Fecha - Ocupa menos espacio */}
-                    <div className="col-span-1 md:col-span-4 space-y-1">
-                        <span className="text-xs font-medium text-slate-500 ml-1">Fecha de Compra</span>
-                        <div className="relative">
-                            <Input
-                                type="date"
-                                className="bg-white"
-                                value={dateFilter}
-                                onChange={(e) => setDateFilter(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* 3. Botón Limpiar */}
-                    <div className="col-span-1 md:col-span-2">
-                        {(search || dateFilter) && (
-                            <Button
-                                variant="ghost"
-                                className="text-red-500 hover:text-red-700 hover:bg-red-50 w-full md:w-auto"
-                                onClick={clearFilters}
-                            >
-                                <X className="h-4 w-4 mr-2" /> Limpiar
-                            </Button>
-                        )}
-                    </div>
-
-                </CardContent>
-            </Card>
+            <DataFilters
+                searchValue={search}
+                onSearchChange={setSearch}
+                searchPlaceholder=""
+                searchColSpan="md:col-span-3 lg:col-span-3"
+                clearColSpan="md:col-span-1"
+                hasActiveFilters={!!(search || dateFilter)}
+                onClear={clearFilters}
+            >
+                {/* FILTROS ESPECÍFICOS (4 Columnas restantes) */}
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Fecha de Compra</span>
+                    <Input
+                        type="date"
+                        className="bg-white"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                    />
+                </div>
+            </DataFilters>
 
             {/* TABLA */}
             <Card>

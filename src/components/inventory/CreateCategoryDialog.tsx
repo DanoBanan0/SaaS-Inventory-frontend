@@ -98,9 +98,6 @@ export function CreateCategoryDialog({ open, onOpenChange, onSuccess }: CreateCa
             <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Nueva Categoría</DialogTitle>
-                    <DialogDescription>
-                        Crea un nuevo grupo de inventario (ej: Impresoras).
-                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6 py-4">
@@ -109,7 +106,6 @@ export function CreateCategoryDialog({ open, onOpenChange, onSuccess }: CreateCa
                         <Label className="text-slate-700 font-semibold">Nombre de Categoría</Label>
                         <Input
                             autoFocus
-                            placeholder="Ej: Impresoras, Proyectores..."
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="text-lg"
@@ -121,28 +117,18 @@ export function CreateCategoryDialog({ open, onOpenChange, onSuccess }: CreateCa
                         <div className="flex items-center justify-between border-b pb-2">
                             <div className="flex items-center gap-2">
                                 <List className="w-4 h-4 text-blue-600" />
-                                <Label className="text-slate-700 font-medium">Características (Columnas)</Label>
+                                <Label className="text-slate-700 font-medium">Características Extras</Label>
                             </div>
                             <Button size="sm" variant="ghost" onClick={addField} className="text-blue-700 hover:text-blue-800 hover:bg-blue-50">
                                 <Plus className="w-4 h-4 mr-1" /> Agregar
                             </Button>
                         </div>
 
-                        {fields.length === 0 && (
-                            <div className="text-center py-6 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                                <p className="text-sm text-slate-400">
-                                    Sin características personalizadas.<br />
-                                    (Solo se pedirá Marca, Modelo y Serial)
-                                </p>
-                            </div>
-                        )}
-
                         <div className="space-y-3">
                             {fields.map((field, index) => (
                                 <div key={index} className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
                                     <div className="flex-1">
                                         <Input
-                                            placeholder="Nombre del campo (Ej: Color, Peso...)"
                                             value={field.label}
                                             onChange={(e) => updateField(index, e.target.value)}
                                         />
