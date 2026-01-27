@@ -117,7 +117,7 @@ export default function EmployeesPage() {
                 onClear={clearFilters}
             >
                 <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
-                    <span className="text-xs font-medium text-slate-500 ml-1">Filtrar por Unidad</span>
+                    <span className="text-xs font-medium text-slate-500 ml-1">Unidad</span>
                     <Select
                         value={unitFilter || "all"}
                         onValueChange={(val) => setUnitFilter(val === "all" ? "" : val)}

@@ -25,7 +25,6 @@ export function AddColumnDialog({ open, onOpenChange, categoryId, onSuccess }: A
         setLoading(true);
 
         try {
-            // Por defecto enviamos 'text' ya que todos los campos serán strings
             await api.post(`/categories/${categoryId}/fields`, {
                 label: label,
                 type: "text",
@@ -68,9 +67,6 @@ export function AddColumnDialog({ open, onOpenChange, categoryId, onSuccess }: A
                             value={label}
                             onChange={(e) => setLabel(e.target.value)}
                         />
-                        <p className="text-xs text-slate-400">
-                            Se creará como campo de texto opcional.
-                        </p>
                     </div>
                 </div>
 

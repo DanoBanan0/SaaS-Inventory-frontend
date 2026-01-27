@@ -115,7 +115,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
 
                 <div className="py-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
 
-                    {/* 1. Empleado (Asignado A) */}
                     <div className="space-y-1">
                         <Label>Asignar a Empleado</Label>
                         <Select value={formData.employee_id} onValueChange={handleEmployeeChange}>
@@ -133,7 +132,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                         </Select>
                     </div>
 
-                    {/* 2. Código Inventario */}
                     <div className="space-y-1">
                         <Label>Código Inventario *</Label>
                         <Input
@@ -142,7 +140,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                         />
                     </div>
 
-                    {/* 3. Marca */}
                     <div className="space-y-1">
                         <Label>Marca</Label>
                         <Input
@@ -151,7 +148,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                         />
                     </div>
 
-                    {/* 4. Modelo */}
                     <div className="space-y-1">
                         <Label>Modelo</Label>
                         <Input
@@ -160,7 +156,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                         />
                     </div>
 
-                    {/* 5. Serial */}
                     <div className="space-y-1">
                         <Label>Número de Serie *</Label>
                         <Input
@@ -169,7 +164,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                         />
                     </div>
 
-                    {/* 6. Factura (Requerido por sistema) */}
                     <div className="space-y-1">
                         <Label>Factura de Origen *</Label>
                         <Select onValueChange={(val) => setFormData({ ...formData, purchase_id: val })}>
@@ -186,7 +180,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                         </Select>
                     </div>
 
-                    {/* 7. CAMPOS DINÁMICOS (Siguen el orden de la tabla) */}
                     {category?.fields && category.fields.map((field: any) => (
                         <div key={field.key} className="space-y-1">
                             <Label>
@@ -199,7 +192,6 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                         </div>
                     ))}
 
-                    {/* 8. Estado */}
                     <div className="space-y-1">
                         <Label>Estado Actual</Label>
                         <Select value={formData.status} onValueChange={(val) => setFormData({ ...formData, status: val })}>
@@ -214,12 +206,11 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                                 <SelectItem value="available">🟢 Disponible</SelectItem>
                                 <SelectItem value="assigned">🔵 Asignado</SelectItem>
                                 <SelectItem value="maintenance">🟠 En Mantenimiento</SelectItem>
-                                <SelectItem value="retired">🔴 Retirado</SelectItem>
+                                <SelectItem value="retired">🔴 Descargo</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
-                    {/* 9. Comentarios (Ocupa todo el ancho) */}
                     <div className="col-span-1 md:col-span-2 space-y-1">
                         <Label>Comentarios</Label>
                         <Textarea

@@ -27,22 +27,18 @@ export function CreateCategoryDialog({ open, onOpenChange, onSuccess }: CreateCa
     const [name, setName] = useState("");
     const [fields, setFields] = useState<Field[]>([]);
 
-    // Agregar campo (Por defecto ahora siempre es "text" / string)
     const addField = () => {
         setFields([...fields, { label: "", key: "", type: "text", required: false }]);
     };
 
     const updateField = (index: number, value: string) => {
         const newFields = [...fields];
-        // Actualizamos el Label
         newFields[index].label = value;
-
-        // Generamos la Key automática (ej: "Color Vehículo" -> "color_vehiculo")
         newFields[index].key = value
             .toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quitar tildes
-            .replace(/[^a-z0-9]/g, "_") // Solo letras y números
-            .replace(/_+/g, "_"); // Evitar guiones dobles
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]/g, "_")
+            .replace(/_+/g, "_");
 
         setFields(newFields);
     };
@@ -54,7 +50,6 @@ export function CreateCategoryDialog({ open, onOpenChange, onSuccess }: CreateCa
     const handleSubmit = async () => {
         if (!name.trim()) return;
 
-        // Validar que no haya campos vacíos
         if (fields.some(f => !f.label.trim())) {
             Swal.fire("Atención", "Define el nombre de todas las características o elimina las vacías.", "warning");
             return;
@@ -101,7 +96,6 @@ export function CreateCategoryDialog({ open, onOpenChange, onSuccess }: CreateCa
                 </DialogHeader>
 
                 <div className="space-y-6 py-4">
-                    {/* Nombre de la Categoría */}
                     <div className="space-y-2">
                         <Label className="text-slate-700 font-semibold">Nombre de Categoría</Label>
                         <Input
@@ -112,7 +106,6 @@ export function CreateCategoryDialog({ open, onOpenChange, onSuccess }: CreateCa
                         />
                     </div>
 
-                    {/* Constructor de Campos */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between border-b pb-2">
                             <div className="flex items-center gap-2">

@@ -21,7 +21,7 @@ export function CreatePurchaseDialog({ open, onOpenChange, onSuccess }: CreatePu
         provider: "",
         invoice_number: "",
         purchase_date: new Date().toISOString().split('T')[0],
-        total_amount: "" // <--- Nuevo estado inicial
+        total_amount: ""
     });
 
     const handleSubmit = async () => {
@@ -70,7 +70,6 @@ export function CreatePurchaseDialog({ open, onOpenChange, onSuccess }: CreatePu
                     <div className="space-y-2">
                         <Label>Proveedor</Label>
                         <Input
-                            placeholder="Ej: Office Depot, Dell Inc..."
                             value={formData.provider}
                             onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
                         />
@@ -79,7 +78,6 @@ export function CreatePurchaseDialog({ open, onOpenChange, onSuccess }: CreatePu
                     <div className="space-y-2">
                         <Label>Número de Factura / Ticket</Label>
                         <Input
-                            placeholder="Ej: FAC-001234"
                             value={formData.invoice_number}
                             onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
                         />
@@ -100,12 +98,12 @@ export function CreatePurchaseDialog({ open, onOpenChange, onSuccess }: CreatePu
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Monto Total ($)</Label>
+                    <Label>Monto Total</Label>
                     <div className="relative">
                         <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
                         <Input
                             type="number"
-                            step="0.01"
+                            style={{ MozAppearance: 'textfield' }}
                             placeholder="0.00"
                             className="pl-8"
                             value={formData.total_amount}

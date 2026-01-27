@@ -23,9 +23,9 @@ export function CreateEmployeeDialog({ open, onOpenChange, onSuccess }: CreateEm
     const [formData, setFormData] = useState({
         name: "",
         unit_id: "",
-        email: "",      // <--- Campo Nuevo
-        job_title: "",  // <--- Campo Nuevo
-        status: "1"     // "1" visualmente es Activo
+        email: "",
+        job_title: "",
+        status: "1"
     });
 
     useEffect(() => {
@@ -42,7 +42,6 @@ export function CreateEmployeeDialog({ open, onOpenChange, onSuccess }: CreateEm
 
         setLoading(true);
         try {
-            // Convertimos el "1" o "0" del select a true/false para Laravel
             await api.post("/employees", {
                 ...formData,
                 status: formData.status === "1"
@@ -50,7 +49,6 @@ export function CreateEmployeeDialog({ open, onOpenChange, onSuccess }: CreateEm
 
             Swal.fire({ icon: "success", title: "Empleado Registrado", timer: 1500, showConfirmButton: false });
 
-            // Limpiamos el formulario
             setFormData({ name: "", unit_id: "", email: "", job_title: "", status: "1" });
             onSuccess();
             onOpenChange(false);
@@ -71,23 +69,21 @@ export function CreateEmployeeDialog({ open, onOpenChange, onSuccess }: CreateEm
                     </DialogTitle>
                 </DialogHeader>
 
+                {/* Nombre */}
                 <div className="py-4 space-y-4">
-                    {/* Fila 1: Nombre y Cargo */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label>Nombre Completo</Label>
                             <Input
-                                placeholder="Ej: Juan Pérez"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Cargo / Puesto</Label>
+                            <Label>Cargo</Label>
                             <div className="relative">
                                 <Briefcase className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
                                 <Input
-                                    placeholder="Ej: Analista"
                                     className="pl-8"
                                     value={formData.job_title}
                                     onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
@@ -96,14 +92,13 @@ export function CreateEmployeeDialog({ open, onOpenChange, onSuccess }: CreateEm
                         </div>
                     </div>
 
-                    {/* Fila 2: Correo */}
+                    {/* Correo */}
                     <div className="space-y-2">
                         <Label>Correo Electrónico</Label>
                         <div className="relative">
                             <Mail className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
                             <Input
                                 type="email"
-                                placeholder="juan.perez@empresa.com"
                                 className="pl-8"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -111,9 +106,9 @@ export function CreateEmployeeDialog({ open, onOpenChange, onSuccess }: CreateEm
                         </div>
                     </div>
 
-                    {/* Fila 3: Unidad */}
+                    {/* Unidad */}
                     <div className="space-y-2">
-                        <Label>Unidad / Departamento</Label>
+                        <Label>Unidad</Label>
                         <Select onValueChange={(val) => setFormData({ ...formData, unit_id: val })}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Seleccione unidad..." />

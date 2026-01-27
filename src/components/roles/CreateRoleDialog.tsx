@@ -50,7 +50,6 @@ export function CreateRoleDialog({ open, onOpenChange, onSuccess }: CreateRoleDi
                 <div className="py-4 space-y-2">
                     <Label>Nombre del Rol</Label>
                     <Input
-                        placeholder="Ej: Auditor, Supervisor..."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />

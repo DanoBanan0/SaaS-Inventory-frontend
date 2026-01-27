@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Swal from "sweetalert2";
-import api from "@/lib/axios"; // Importamos API para consultar rol fresco
+import api from "@/lib/axios";
 
 interface SidebarProps {
     className?: string;
@@ -21,40 +21,31 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
     const pathname = usePathname();
     const router = useRouter();
 
-    // Estado para el usuario y para la etiqueta del rol
     const [user, setUser] = useState<{ name: string; role_id: number; id: number } | null>(null);
     const [roleLabel, setRoleLabel] = useState("Cargando...");
 
     useEffect(() => {
-        // 1. Carga inicial rápida desde localStorage
         const storedUser = localStorage.getItem("user");
         let initialUser = storedUser ? JSON.parse(storedUser) : null;
 
         if (initialUser) {
             setUser(initialUser);
-            // Si ya teníamos el nombre del rol guardado, lo usamos de momento
-            // @ts-ignore
             if (initialUser.role?.name) setRoleLabel(initialUser.role.name);
             else setRoleLabel(initialUser.role_id === 1 ? "Admin" : "Usuario");
         }
 
-        // 2. Consultar a la API para obtener el ROL REAL actualizado
         const fetchFreshUser = async () => {
             if (!initialUser?.id) return;
             try {
-                // Obtenemos la lista de usuarios (que incluye la relación role)
                 const res = await api.get('/users');
                 const usersList = res.data.data || res.data;
 
-                // Buscamos mis datos
                 const myData = usersList.find((u: any) => u.id === initialUser.id);
 
                 if (myData) {
                     setUser(myData);
-                    // Actualizamos localStorage para futuras cargas
                     localStorage.setItem("user", JSON.stringify(myData));
 
-                    // Actualizamos la etiqueta con el nombre real del rol (Ej: "Developer")
                     setRoleLabel(myData.role?.name || "Sin Rol");
                 }
             } catch (error) {
@@ -99,7 +90,7 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
         {
             section: "Sistema", items: [
                 { label: "Usuarios", href: "/users", icon: UserCircle },
-                { label: "Roles", href: "/roles", icon: ShieldCheck }, // Icono actualizado
+                { label: "Roles", href: "/roles", icon: ShieldCheck },
                 { label: "Auditoría", href: "/audits", icon: FileText },
             ]
         },
@@ -107,12 +98,13 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
 
     return (
         <aside className={cn("bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col h-full", className)}>
-
-            {/* HEADER */}
             <div className="p-6 border-b border-slate-800 bg-slate-950/50">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2 text-white">
-                        <span className="text-xl font-bold tracking-tight">INDES<span className="text-blue-500">INVENTORY</span></span>
+                        <a href="https://inventory-frontend-kappa-ashy.vercel.app/dashboard">
+                            <span className="text-xl font-bold tracking-tight">INDES<span className="text-blue-500">INVENTORY</span></span>
+                        </a>
+
                     </div>
 
                     {onCollapse && (
@@ -126,14 +118,12 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
                     )}
                 </div>
 
-                {/* PERFIL DE USUARIO */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
                     <div className="h-10 w-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-200 font-bold border border-blue-700">
                         {user?.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                     <div className="overflow-hidden">
                         <p className="text-sm font-medium text-white truncate">{user?.name || "..."}</p>
-                        {/* AQUI SE MUESTRA EL ROL REAL */}
                         <p className="text-xs text-blue-400 uppercase font-bold truncate tracking-wide">
                             {roleLabel}
                         </p>
@@ -141,7 +131,6 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
                 </div>
             </div>
 
-            {/* NAVEGACIÓN */}
             <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
                 {menuItems.map((section, idx) => (
                     <div key={idx}>
@@ -170,7 +159,6 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
                 ))}
             </div>
 
-            {/* FOOTER */}
             <div className="p-4 border-t border-slate-800 bg-slate-950/30">
                 <button onClick={handleLogout} className="flex w-full items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-red-400 hover:bg-red-950/30 transition-colors">
                     <LogOut className="w-5 h-5" /> Cerrar Sesión

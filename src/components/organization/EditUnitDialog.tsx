@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 interface EditUnitDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    unit: any; // La unidad a editar
+    unit: any;
     onSuccess: () => void;
 }
 
@@ -20,7 +20,6 @@ export function EditUnitDialog({ open, onOpenChange, unit, onSuccess }: EditUnit
     const [loading, setLoading] = useState(false);
     const [name, setName] = useState("");
 
-    // Rellenar el nombre cuando abrimos el modal
     useEffect(() => {
         if (unit) {
             setName(unit.name);

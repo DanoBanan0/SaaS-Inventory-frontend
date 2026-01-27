@@ -57,7 +57,6 @@ export function CreateUnitDialog({ open, onOpenChange, onSuccess }: CreateUnitDi
                     <Label>Nombre del Departamento / Unidad</Label>
                     <Input
                         autoFocus
-                        placeholder="Ej: Recursos Humanos, Informática..."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />

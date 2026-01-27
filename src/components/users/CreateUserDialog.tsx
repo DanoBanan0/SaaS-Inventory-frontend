@@ -25,7 +25,7 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
         email: "",
         password: "",
         role_id: "",
-        is_active: "1" // "1" para true, "0" para false (Laravel lo entiende)
+        is_active: "1"
     });
 
     useEffect(() => {
@@ -34,31 +34,23 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
                 .then((res) => {
                     const allRoles = res.data;
 
-                    // 1. Obtener el usuario actual (Asumiendo que lo guardaste en localStorage al login)
-                    // Si usas un Context, cámbialo por: const { user } = useAuth();
                     const userStr = localStorage.getItem('user');
                     const currentUser = userStr ? JSON.parse(userStr) : null;
 
-                    // Obtenemos el nombre del rol del usuario logueado (ej: "admin", "developer")
-                    // Nota: Asegúrate de que tu backend envíe el objeto 'role' en el login
                     const myRoleName = currentUser?.role?.name?.toLowerCase() || "";
 
-                    // 2. Filtrar dinámicamente por NOMBRE
                     const visibleRoles = allRoles.filter((r: any) => {
                         const roleName = r.name.toLowerCase();
 
-                        // ¿Es este rol un rol de "Developer"?
                         const isDevRole = roleName.includes('dev');
 
-                        // ¿Soy yo un "Developer"?
                         const amIDev = myRoleName.includes('dev');
 
-                        // REGLA: Si el rol es Dev, y yo NO soy Dev -> OCULTAR
                         if (isDevRole && !amIDev) {
                             return false;
                         }
 
-                        return true; // Mostrar el resto (Admin, User, etc.)
+                        return true;
                     });
 
                     setRoles(visibleRoles);
@@ -75,7 +67,6 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
 
         setLoading(true);
         try {
-            // Convertimos "1"/"0" a booleano real o enviamos 1/0
             await api.post("/users", {
                 ...formData,
                 is_active: formData.is_active === "1"
@@ -124,7 +115,6 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        {/* ROL */}
                         <div className="space-y-2">
                             <Label>Rol</Label>
                             <Select value={formData.role_id} onValueChange={(val) => setFormData({ ...formData, role_id: val })}>
@@ -139,7 +129,6 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
                             </Select>
                         </div>
 
-                        {/* ESTADO (is_active) */}
                         <div className="space-y-2">
                             <Label>Estado</Label>
                             <Select value={formData.is_active} onValueChange={(val) => setFormData({ ...formData, is_active: val })}>

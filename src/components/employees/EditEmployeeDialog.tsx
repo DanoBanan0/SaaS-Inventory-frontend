@@ -37,9 +37,8 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
             setFormData({
                 name: employee.name,
                 unit_id: employee.unit_id?.toString() || "",
-                email: employee.email || "",          // Cargar email existente
-                job_title: employee.job_title || "",  // Cargar cargo existente
-                // Importante: Si employee.status es true (booleano), ponemos "1", si no "0"
+                email: employee.email || "",
+                job_title: employee.job_title || "",
                 status: employee.status ? "1" : "0"
             });
         }
@@ -48,7 +47,6 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            // Enviamos booleanos (true/false) gracias a la comparación === "1"
             await api.put(`/employees/${employee.id}`, {
                 ...formData,
                 status: formData.status === "1"
@@ -58,7 +56,6 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
             onSuccess();
             onOpenChange(false);
         } catch (error: any) {
-            // Mostramos el mensaje exacto del backend si hay error (ej: email duplicado)
             Swal.fire("Error", error.response?.data?.message || "No se pudo actualizar", "error");
         } finally {
             setLoading(false);
@@ -75,6 +72,7 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
                     </DialogTitle>
                 </DialogHeader>
 
+                {/* Nombre */}
                 <div className="py-4 space-y-4">
                     <div className="space-y-2">
                         <Label>Nombre Completo</Label>
@@ -84,8 +82,9 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
                         />
                     </div>
 
+                    {/* Cargo */}
                     <div className="space-y-2">
-                        <Label>Cargo / Puesto</Label>
+                        <Label>Cargo</Label>
                         <div className="relative">
                             <Briefcase className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
                             <Input
@@ -97,6 +96,7 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
                         </div>
                     </div>
 
+                    {/* Correo */}
                     <div className="space-y-2">
                         <Label>Correo Electrónico</Label>
                         <div className="relative">
@@ -110,8 +110,8 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
                         </div>
                     </div>
 
+                    {/* Unidad */}
                     <div className="grid grid-cols-2 gap-4">
-                        {/* UNIDAD */}
                         <div className="space-y-2">
                             <Label>Unidad</Label>
                             <Select value={formData.unit_id} onValueChange={(val) => setFormData({ ...formData, unit_id: val })}>
@@ -128,7 +128,7 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
                             </Select>
                         </div>
 
-                        {/* ESTADO */}
+                        {/* Estado */}
                         <div className="space-y-2">
                             <Label>Estado</Label>
                             <Select value={formData.status} onValueChange={(val) => setFormData({ ...formData, status: val })}>

@@ -31,7 +31,6 @@ export function EditUserDialog({ open, onOpenChange, user, onSuccess }: EditUser
 
     useEffect(() => {
         if (open) {
-            // 1. Cargar roles (Esto ya lo tenías)
             api.get("/roles")
                 .then((res) => {
                     const allRoles = res.data;
@@ -52,15 +51,12 @@ export function EditUserDialog({ open, onOpenChange, user, onSuccess }: EditUser
                 })
                 .catch(console.error);
 
-            // 2. CARGAR DATOS DEL USUARIO (¡ESTO FALTABA!) 👈
             if (user) {
                 setFormData({
                     name: user.name || "",
                     email: user.email || "",
-                    password: "", // La contraseña se deja vacía siempre
-                    // Convertimos a string porque el Select espera string
+                    password: "",
                     role_id: user.role_id ? user.role_id.toString() : "",
-                    // Convertimos true/1 a "1" y false/0 a "0"
                     is_active: user.is_active ? "1" : "0"
                 });
             }
@@ -72,7 +68,7 @@ export function EditUserDialog({ open, onOpenChange, user, onSuccess }: EditUser
         try {
             const payload: any = {
                 ...formData,
-                is_active: formData.is_active === "1" // Convertimos a booleano para enviar
+                is_active: formData.is_active === "1"
             };
             if (!payload.password) delete payload.password;
 

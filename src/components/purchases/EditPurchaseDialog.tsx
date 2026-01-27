@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Pencil, Calendar as CalendarIcon, DollarSign } from "lucide-react"; // Importamos DollarSign
+import { Loader2, Pencil, Calendar as CalendarIcon, DollarSign } from "lucide-react";
 import Swal from "sweetalert2";
 
 interface EditPurchaseDialogProps {
@@ -22,17 +22,16 @@ export function EditPurchaseDialog({ open, onOpenChange, purchase, onSuccess }: 
         provider: "",
         invoice_number: "",
         purchase_date: "",
-        total_amount: "" // <--- 1. Agregamos el estado para el monto
+        total_amount: ""
     });
 
-    // 2. Al abrir el modal, rellenamos TODOS los campos (incluido el monto)
     useEffect(() => {
         if (purchase) {
             setFormData({
                 provider: purchase.provider || "",
                 invoice_number: purchase.invoice_number || "",
                 purchase_date: purchase.purchase_date ? purchase.purchase_date.split('T')[0] : "",
-                total_amount: purchase.total_amount || "" // <--- Cargamos el monto existente
+                total_amount: purchase.total_amount || ""
             });
         }
     }, [purchase]);
@@ -52,7 +51,6 @@ export function EditPurchaseDialog({ open, onOpenChange, purchase, onSuccess }: 
             onSuccess();
             onOpenChange(false);
         } catch (error: any) {
-            // Mejoramos el mensaje de error para saber qué está fallando
             const msg = error.response?.data?.message || "No se pudo actualizar";
             Swal.fire("Error", msg, "error");
         } finally {
@@ -87,7 +85,6 @@ export function EditPurchaseDialog({ open, onOpenChange, purchase, onSuccess }: 
                         />
                     </div>
 
-                    {/* 3. Agregamos el Input de Monto Total */}
                     <div className="space-y-2">
                         <Label>Monto Total ($)</Label>
                         <div className="relative">

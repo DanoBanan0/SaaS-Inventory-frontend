@@ -18,20 +18,20 @@ export default function DashboardLayout({
     return (
         <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
 
-            {/* 1. SIDEBAR DESKTOP */}
             <div
                 className={cn(
                     "hidden md:flex h-screen w-64 flex-col fixed inset-y-0 z-40 transition-transform duration-300 ease-in-out",
                     isDesktopSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                {/* Pasamos la función onCollapse al Sidebar para que muestre el botón interno */}
                 <Sidebar onCollapse={() => setIsDesktopSidebarOpen(false)} />
             </div>
 
-            {/* 2. HEADER MÓVIL */}
+
             <div className="md:hidden fixed top-0 w-full z-50 bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between">
-                <span className="text-white font-bold text-lg">GOBIERNO<span className="text-blue-500">TECH</span></span>
+                <a href="https://inventory-frontend-kappa-ashy.vercel.app/dashboard">
+                    <span className="text-white font-bold text-lg">INDES<span className="text-blue-500">INVENTORY</span></span>
+                </a>
 
                 <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                     <SheetTrigger asChild>
@@ -45,19 +45,16 @@ export default function DashboardLayout({
                 </Sheet>
             </div>
 
-            {/* 3. CONTENIDO PRINCIPAL */}
             <main
                 className={cn(
                     "flex-1 w-full transition-all duration-300 ease-in-out relative",
-                    "pt-20 md:pt-8", // Padding top
-                    isDesktopSidebarOpen ? "md:pl-64" : "md:pl-0" // Margen izquierdo dinámico
+                    "pt-20 md:pt-8",
+                    isDesktopSidebarOpen ? "md:pl-64" : "md:pl-0"
                 )}
             >
-                {/* BOTÓN FLOTANTE (Solo visible cuando el Sidebar está CERRADO y en Desktop) */}
                 {!isDesktopSidebarOpen && (
                     <Button
                         variant="outline"
-                        // Quitamos size="icon" para poner medidas personalizadas más grandes
                         onClick={() => setIsDesktopSidebarOpen(true)}
                         className="hidden md:flex fixed top-6 left-6 z-50 
                            h-12 w-12 rounded-full border-2 border-slate-200 bg-white 
@@ -65,7 +62,6 @@ export default function DashboardLayout({
                            hover:border-blue-500 hover:text-blue-600 hover:scale-110 hover:bg-white"
                         title="Mostrar menú"
                     >
-                        {/* Icono más grande (h-6 w-6 equivale a 24px) */}
                         <PanelLeftOpen className="h-6 w-6" strokeWidth={2.5} />
                     </Button>
                 )}

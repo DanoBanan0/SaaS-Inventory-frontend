@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import Swal from "sweetalert2"; // Alertas bonitas
-import { Mail, Lock, Loader2, ShieldCheck } from "lucide-react"; // Iconos Lucide
+import { Mail, Lock, Loader2, ShieldCheck, CirclePile, Blocks, PackageOpen } from "lucide-react"; // Iconos Lucide
 
 export default function LoginPage() {
     const router = useRouter();
@@ -70,31 +70,29 @@ export default function LoginPage() {
             <Card className="w-full max-w-md shadow-2xl border-slate-200 dark:border-slate-800">
                 <CardHeader className="space-y-1 text-center pb-8">
                     <div className="flex justify-center mb-4">
-                        <div className="p-3 bg-blue-100 dark:bg-slate-800 rounded-full">
-                            {/* Icono Principal (Logo Simulado) */}
-                            <ShieldCheck className="w-10 h-10 text-blue-700 dark:text-blue-500" />
+                        <div>
+                        {/* <div className="p-3 bg-blue-100 dark:bg-slate-800 rounded-full"> */}
+                            <PackageOpen className="w-10 h-10 text-blue-700 dark:text-blue-500" />
                         </div>
                     </div>
                     <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
                         Sistema de Inventario
                     </CardTitle>
-                    <CardDescription className="text-slate-500">
-                        Ingrese sus credenciales gubernamentales
-                    </CardDescription>
+
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleLogin} className="space-y-6">
 
                         {/* Input Email */}
                         <div className="space-y-2">
-                            <Label htmlFor="email">Correo Institucional</Label>
+                            <Label htmlFor="email">Correo</Label>
                             <div className="relative">
                                 <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                                 <Input
                                     id="email"
                                     name="email"
                                     type="email"
-                                    placeholder="admin@gob.sv"
+                                    placeholder="usuario@indes.sv"
                                     className="pl-9 bg-slate-50 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                                     value={form.email}
                                     onChange={handleChange}

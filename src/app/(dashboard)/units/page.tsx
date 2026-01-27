@@ -92,6 +92,7 @@ export default function UnitsPage() {
             <DataFilters
                 searchValue={search}
                 onSearchChange={setSearch}
+                searchColSpan="md:col-span-3 lg:col-span-3"
                 clearColSpan="md:col-span-1"
                 hasActiveFilters={!!search}
                 onClear={clearFilters}
