@@ -127,9 +127,9 @@
 
 .swal2-container {
   z-index: 100000 !important;
+  pointer-events: auto !important;
 }
 
-/* Opcional: Ajustar la fuente para que coincida con tu app */
 .swal2-popup {
   font-family: inherit !important;
 }

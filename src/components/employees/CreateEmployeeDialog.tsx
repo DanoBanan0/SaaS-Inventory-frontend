@@ -115,7 +115,7 @@ export function CreateEmployeeDialog({ open, onOpenChange, onSuccess }: CreateEm
                             </SelectTrigger>
                             <SelectContent>
                                 {units.map((unit) => (
-                                    <SelectItem key={unit.id} value={unit.id.toString()}>
+                                    <SelectItem key={unit.id} value={unit.id}>
                                         {unit.name}
                                     </SelectItem>
                                 ))}

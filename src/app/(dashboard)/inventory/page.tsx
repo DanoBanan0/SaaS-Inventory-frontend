@@ -10,7 +10,7 @@ import { Plus, Box, ChevronRight, Loader2 } from "lucide-react";
 import { CreateCategoryDialog } from "@/components/inventory/CreateCategoryDialog";
 
 interface Category {
-    id: number;
+    id: string;
     name: string;
 }
 

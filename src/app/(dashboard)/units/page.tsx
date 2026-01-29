@@ -47,7 +47,7 @@ export default function UnitsPage() {
         setIsEditOpen(true);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         Swal.fire({
             title: "¿Eliminar Unidad?",
             text: "Esta acción no se puede deshacer.",

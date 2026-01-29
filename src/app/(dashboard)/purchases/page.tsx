@@ -57,7 +57,7 @@ export default function PurchasesPage() {
         setIsEditOpen(true);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         Swal.fire({
             title: "¿Eliminar Factura?",
             text: "Si tiene equipos registrados, no se podrá borrar.",

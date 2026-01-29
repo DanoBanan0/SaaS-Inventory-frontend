@@ -61,7 +61,7 @@ export default function RolesPage() {
         setIsEditOpen(true);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         Swal.fire({
             title: "¿Eliminar Rol?",
             text: "No podrás eliminarlo si hay usuarios asignados.",

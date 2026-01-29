@@ -61,8 +61,8 @@ export function EditDeviceDialog({ open, onOpenChange, category, device, onSucce
                 serial_number: device.serial_number || "",
                 brand: device.brand || "",
                 model: device.model || "",
-                purchase_id: device.purchase_id ? device.purchase_id.toString() : "",
-                employee_id: device.employee_id ? device.employee_id.toString() : "unassigned",
+                purchase_id: device.purchase_id ?? "",
+                employee_id: device.employee_id ?? "unassigned",
                 status: device.status || "available",
                 comments: device.comments || "",
                 specs: device.specs || {}
@@ -119,9 +119,9 @@ export function EditDeviceDialog({ open, onOpenChange, category, device, onSucce
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="unassigned" className="text-slate-500">-- Sin asignar (Bodega) --</SelectItem>
+                                <SelectItem value="unassigned" className="text-slate-500">-- Sin asignar --</SelectItem>
                                 {employees.map(emp => (
-                                    <SelectItem key={emp.id} value={emp.id.toString()}>
+                                    <SelectItem key={emp.id} value={emp.id}>
                                         {emp.name}
                                     </SelectItem>
                                 ))}
@@ -169,7 +169,7 @@ export function EditDeviceDialog({ open, onOpenChange, category, device, onSucce
                             </SelectTrigger>
                             <SelectContent>
                                 {purchases.map(p => (
-                                    <SelectItem key={p.id} value={p.id.toString()}>
+                                    <SelectItem key={p.id} value={p.id}>
                                         {p.invoice_number} - {p.provider}
                                     </SelectItem>
                                 ))}

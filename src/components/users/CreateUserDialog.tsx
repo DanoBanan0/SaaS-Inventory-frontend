@@ -121,7 +121,7 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
                                 <SelectTrigger><SelectValue placeholder="Rol" /></SelectTrigger>
                                 <SelectContent>
                                     {roles.map((role) => (
-                                        <SelectItem key={role.id} value={role.id.toString()}>
+                                        <SelectItem key={role.id} value={role.id}>
                                             <div className="flex items-center gap-2">{getRoleIcon(role.name)} {role.name}</div>
                                         </SelectItem>
                                     ))}

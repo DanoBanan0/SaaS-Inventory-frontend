@@ -11,6 +11,14 @@ import { cn } from "@/lib/utils";
 import Swal from "sweetalert2";
 import api from "@/lib/axios";
 
+type StoredUser = {
+    name: string;
+    role_id?: string;
+    id: string;
+    role?: { name?: string };
+    [key: string]: any;
+};
+
 interface SidebarProps {
     className?: string;
     onNavigate?: () => void;
@@ -21,17 +29,25 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
     const pathname = usePathname();
     const router = useRouter();
 
-    const [user, setUser] = useState<{ name: string; role_id: number; id: number } | null>(null);
+    const [user, setUser] = useState<StoredUser | null>(null);
     const [roleLabel, setRoleLabel] = useState("Cargando...");
+
+    const normalizeUser = (rawUser: any): StoredUser | null => {
+        if (!rawUser) return null;
+        return {
+            ...rawUser,
+            id: rawUser.id != null ? String(rawUser.id) : "",
+            role_id: rawUser.role_id != null ? String(rawUser.role_id) : undefined,
+        };
+    };
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
-        let initialUser = storedUser ? JSON.parse(storedUser) : null;
+        const initialUser = storedUser ? normalizeUser(JSON.parse(storedUser)) : null;
 
         if (initialUser) {
             setUser(initialUser);
-            if (initialUser.role?.name) setRoleLabel(initialUser.role.name);
-            else setRoleLabel(initialUser.role_id === 1 ? "Admin" : "Usuario");
+            setRoleLabel(initialUser.role?.name || "Usuario");
         }
 
         const fetchFreshUser = async () => {
@@ -42,11 +58,13 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
 
                 const myData = usersList.find((u: any) => u.id === initialUser.id);
 
-                if (myData) {
-                    setUser(myData);
-                    localStorage.setItem("user", JSON.stringify(myData));
+                const normalized = normalizeUser(myData);
 
-                    setRoleLabel(myData.role?.name || "Sin Rol");
+                if (normalized) {
+                    setUser(normalized);
+                    localStorage.setItem("user", JSON.stringify(normalized));
+
+                    setRoleLabel(normalized.role?.name || "Sin Rol");
                 }
             } catch (error) {
                 console.error("Error actualizando perfil:", error);
@@ -104,7 +122,6 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
                         <a href="https://inventory-frontend-kappa-ashy.vercel.app/dashboard">
                             <span className="text-xl font-bold tracking-tight">INDES<span className="text-blue-500">INVENTORY</span></span>
                         </a>
-
                     </div>
 
                     {onCollapse && (

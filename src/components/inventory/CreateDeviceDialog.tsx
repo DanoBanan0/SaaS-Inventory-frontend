@@ -122,9 +122,9 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="unassigned" className="text-slate-500">-- Sin asignar (Bodega) --</SelectItem>
+                                <SelectItem value="unassigned" className="text-slate-500">-- Sin asignar --</SelectItem>
                                 {employees.map(emp => (
-                                    <SelectItem key={emp.id} value={emp.id.toString()}>
+                                    <SelectItem key={emp.id} value={emp.id}>
                                         {emp.name} {emp.unit ? `(${emp.unit.name})` : ''}
                                     </SelectItem>
                                 ))}
@@ -172,7 +172,7 @@ export function CreateDeviceDialog({ open, onOpenChange, category, onSuccess }: 
                             </SelectTrigger>
                             <SelectContent>
                                 {purchases.map(p => (
-                                    <SelectItem key={p.id} value={p.id.toString()}>
+                                    <SelectItem key={p.id} value={p.id}>
                                         {p.invoice_number} - {p.provider}
                                     </SelectItem>
                                 ))}

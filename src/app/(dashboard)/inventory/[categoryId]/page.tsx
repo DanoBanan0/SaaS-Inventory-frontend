@@ -9,11 +9,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, HardDrive, Columns, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, HardDrive, Columns, Pencil, History } from "lucide-react";
 import { CreateDeviceDialog } from "@/components/inventory/CreateDeviceDialog";
 import { AddColumnDialog } from "@/components/inventory/AddColumnDialog";
 import { EditDeviceDialog } from "@/components/inventory/EditDeviceDialog";
 import { DataFilters } from "@/components/common/DataFilters";
+import { DeviceHistoryDialog } from "@/components/inventory/DeviceHistoryDialog";
 
 export default function CategoryDetailPage() {
     const { categoryId } = useParams();
@@ -22,6 +23,8 @@ export default function CategoryDetailPage() {
     const [category, setCategory] = useState<any>(null);
     const [devices, setDevices] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [historyDeviceId, setHistoryDeviceId] = useState<string | null>(null);
 
     // Estados Modales
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -70,6 +73,12 @@ export default function CategoryDetailPage() {
         }
     }, [categoryId, searchText, statusFilter, unitFilter, dateFilter, category]);
 
+    // Abrir Historial
+    const handleHistoryClick = (deviceId: string) => {
+        setHistoryDeviceId(deviceId);
+        setIsHistoryOpen(true);
+    };
+
     // Efecto Debounce para recargar datos
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -87,7 +96,7 @@ export default function CategoryDetailPage() {
                 setUnits(list);
             } catch (error) {
                 console.error("Error cargando unidades:", error);
-                setUnits([]); 
+                setUnits([]);
             }
         };
         fetchUnits();
@@ -185,8 +194,8 @@ export default function CategoryDetailPage() {
 
                 <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
                     <span className="text-xs font-medium text-slate-500 ml-1">Fecha Registro</span>
-                    <Input 
-                        type="date" 
+                    <Input
+                        type="date"
                         className="bg-white w-full"
                         value={dateFilter}
                         onChange={(e) => setDateFilter(e.target.value)}
@@ -250,14 +259,14 @@ export default function CategoryDetailPage() {
                                         <TableCell>{device.brand}</TableCell>
                                         <TableCell>{device.model}</TableCell>
                                         <TableCell className="text-xs text-slate-500 font-mono uppercase">{device.serial_number}</TableCell>
-                                        
+
                                         {/* Celdas Dinámicas */}
                                         {category?.fields?.map((field: any) => (
                                             <TableCell key={field.key} className="text-slate-600">
                                                 {device.specs?.[field.key] || "-"}
                                             </TableCell>
                                         ))}
-                                        
+
                                         <TableCell>
                                             <Badge className={
                                                 device.status === 'available' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
@@ -276,15 +285,25 @@ export default function CategoryDetailPage() {
                                         <TableCell className="text-xs text-slate-400 whitespace-nowrap">
                                             {formatDate(device.updated_at)}
                                         </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50"
-                                                onClick={() => handleEditClick(device)}
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-slate-400 hover:text-purple-600 hover:bg-purple-50"
+                                                    onClick={() => handleHistoryClick(device.id)}
+                                                >
+                                                    <History className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                                                    onClick={() => handleEditClick(device)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -315,6 +334,12 @@ export default function CategoryDetailPage() {
                 category={category}
                 device={selectedDevice}
                 onSuccess={fetchData}
+            />
+
+            <DeviceHistoryDialog
+                open={isHistoryOpen}
+                onOpenChange={setIsHistoryOpen}
+                deviceId={historyDeviceId}
             />
         </div>
     );

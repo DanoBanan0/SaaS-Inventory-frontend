@@ -67,7 +67,7 @@ export default function EmployeesPage() {
         setIsEditOpen(true);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         Swal.fire({
             title: "¿Dar de baja?",
             text: "Si tiene equipos asignados, no se podrá eliminar.",
@@ -128,7 +128,7 @@ export default function EmployeesPage() {
                         <SelectContent>
                             <SelectItem value="all">Todas</SelectItem>
                             {Array.isArray(units) && units.map((unit) => (
-                                <SelectItem key={unit.id} value={unit.id.toString()}>
+                                <SelectItem key={unit.id} value={unit.id}>
                                     {unit.name}
                                 </SelectItem>
                             ))}

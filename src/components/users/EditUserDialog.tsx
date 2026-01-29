@@ -56,7 +56,7 @@ export function EditUserDialog({ open, onOpenChange, user, onSuccess }: EditUser
                     name: user.name || "",
                     email: user.email || "",
                     password: "",
-                    role_id: user.role_id ? user.role_id.toString() : "",
+                    role_id: user.role_id ?? "",
                     is_active: user.is_active ? "1" : "0"
                 });
             }
@@ -122,7 +122,7 @@ export function EditUserDialog({ open, onOpenChange, user, onSuccess }: EditUser
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     {roles.map((role) => (
-                                        <SelectItem key={role.id} value={role.id.toString()}>
+                                        <SelectItem key={role.id} value={role.id}>
                                             <div className="flex items-center gap-2">{getRoleIcon(role.name)} {role.name}</div>
                                         </SelectItem>
                                     ))}

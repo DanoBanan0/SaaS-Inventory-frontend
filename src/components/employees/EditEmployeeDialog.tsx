@@ -36,7 +36,7 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
         if (employee) {
             setFormData({
                 name: employee.name,
-                unit_id: employee.unit_id?.toString() || "",
+                unit_id: employee.unit_id ?? "",
                 email: employee.email || "",
                 job_title: employee.job_title || "",
                 status: employee.status ? "1" : "0"
@@ -120,7 +120,7 @@ export function EditEmployeeDialog({ open, onOpenChange, employee, onSuccess }: 
                                 </SelectTrigger>
                                 <SelectContent>
                                     {units.map((unit) => (
-                                        <SelectItem key={unit.id} value={unit.id.toString()}>
+                                        <SelectItem key={unit.id} value={unit.id}>
                                             {unit.name}
                                         </SelectItem>
                                     ))}

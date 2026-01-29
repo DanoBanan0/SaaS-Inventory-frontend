@@ -26,7 +26,7 @@ export default function UsersPage() {
         if (typeof window !== 'undefined') {
             const userStr = localStorage.getItem('user');
             const userObj = userStr ? JSON.parse(userStr) : null;
-            return userObj?.id;
+            return userObj?.id != null ? userObj.id.toString() : null;
         }
         return null;
     };
@@ -70,7 +70,7 @@ export default function UsersPage() {
         setIsEditOpen(true);
     };
 
-    const handleDeactivate = (id: number) => {
+    const handleDeactivate = (id: string) => {
         Swal.fire({
             title: "¿Desactivar Usuario?",
             text: "El usuario perderá el acceso al sistema inmediatamente.",
