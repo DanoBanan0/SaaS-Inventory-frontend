@@ -308,15 +308,14 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                                         />
                                         <Label htmlFor="useAssignee" className="cursor-pointer text-sm font-medium text-blue-900 leading-tight pt-0.5">
                                             ¿Firma: <strong>{device.employee.name}</strong>?
-                                            <span className="block text-[10px] text-blue-700 font-normal mt-1">(Empleado Asignado)</span>
                                         </Label>
                                     </div>
                                 )}
 
                                 <div className="space-y-4">
                                     <div>
-                                        <Label className="text-xs font-semibold text-slate-500 mb-2 block">Nombre Completo (Firmante)</Label>
-                                        <Input value={signerName} onChange={e => { setSignerName(e.target.value); setUseAssignedName(false); }} className="bg-white h-10" placeholder="Ej: Juan Pérez" />
+                                        <Label className="text-xs font-semibold text-slate-500 mb-2 block">Nombre Completo</Label>
+                                        <Input value={signerName} onChange={e => { setSignerName(e.target.value); setUseAssignedName(false); }} className="bg-white h-10"/>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
