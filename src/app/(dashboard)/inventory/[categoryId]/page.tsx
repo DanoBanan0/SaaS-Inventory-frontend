@@ -9,12 +9,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, HardDrive, Columns, Pencil, History } from "lucide-react";
+import { ArrowLeft, Plus, HardDrive, Columns, Pencil, History, NotepadText } from "lucide-react";
 import { CreateDeviceDialog } from "@/components/inventory/CreateDeviceDialog";
 import { AddColumnDialog } from "@/components/inventory/AddColumnDialog";
 import { EditDeviceDialog } from "@/components/inventory/EditDeviceDialog";
 import { DataFilters } from "@/components/common/DataFilters";
 import { DeviceHistoryDialog } from "@/components/inventory/DeviceHistoryDialog";
+import { PrintReportDialog } from "@/components/reports/PrintReportDialog";
 
 export default function CategoryDetailPage() {
     const { categoryId } = useParams();
@@ -38,6 +39,14 @@ export default function CategoryDetailPage() {
     const [unitFilter, setUnitFilter] = useState("");
     const [units, setUnits] = useState<any[]>([]);
     const [dateFilter, setDateFilter] = useState(""); // Estado para la fecha
+
+    const [isPrintOpen, setIsPrintOpen] = useState(false);
+    const [printDevice, setPrintDevice] = useState<any>(null); // El dispositivo a imprimir
+
+    const handlePrintClick = (device: any) => {
+        setPrintDevice(device);
+        setIsPrintOpen(true);
+    };
 
     const formatDate = (dateString: string) => {
         if (!dateString) return "-";
@@ -290,6 +299,15 @@ export default function CategoryDetailPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    className="h-8 w-8 text-slate-400 hover:text-orange-600 hover:bg-orange-50"
+                                                    onClick={() => handlePrintClick(device)}
+                                                    title="Imprimir Acta"
+                                                >
+                                                    <NotepadText className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
                                                     className="h-8 w-8 text-slate-400 hover:text-purple-600 hover:bg-purple-50"
                                                     onClick={() => handleHistoryClick(device.id)}
                                                 >
@@ -340,6 +358,12 @@ export default function CategoryDetailPage() {
                 open={isHistoryOpen}
                 onOpenChange={setIsHistoryOpen}
                 deviceId={historyDeviceId}
+            />
+
+            <PrintReportDialog
+                open={isPrintOpen}
+                onOpenChange={setIsPrintOpen}
+                device={printDevice}
             />
         </div>
     );
