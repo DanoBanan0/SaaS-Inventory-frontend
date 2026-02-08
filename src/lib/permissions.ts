@@ -1,7 +1,7 @@
 // src/lib/permissions.ts
 
 // Definimos quiénes son los jefes
-const SUPER_ROLES = ['admin', 'administrador', 'developer'];
+const SUPER_ROLES = ['admin', 'Admin', 'administrador', 'developer'];
 
 export const canManageSystem = (roleName: string | undefined | null) => {
     if (!roleName) return false;
