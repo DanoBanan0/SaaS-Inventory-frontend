@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button"; // Necesitamos botones
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-    FileText, User, ArrowRight, LayoutGrid,
-    Plus, AlertCircle, Link as LinkIcon,
-    ChevronLeft, ChevronRight // Iconos para paginación
+    FileText, User, ArrowRight, Plus, AlertCircle, ChevronLeft, ChevronRight
 } from "lucide-react";
 import {
     Tooltip,
@@ -17,133 +17,211 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DataFilters } from "@/components/common/DataFilters";
 
 export default function AuditsPage() {
 
-    // ... (MANTÉN TU DICCIONARIO FIELD_TRANSLATIONS IGUAL) ...
+    // Traducciones de campos
     const FIELD_TRANSLATIONS: Record<string, string> = {
         is_active: "Estado", comments: "Comentario", name: "Nombre", email: "Correo",
-        role_id: "Rol (Ref)", employee_id: "Empleado (Ref)", device_id: "Equipo (Ref)",
-        unit_id: "Unidad (Ref)", inventory_code: "N° Inventario", brand: "Marca",
+        role_id: "Rol", employee_id: "Empleado", device_id: "Equipo",
+        unit_id: "Unidad", inventory_code: "N° Inventario", brand: "Marca",
         model: "Modelo", serial_number: "Serie", status: "Estado", provider: "Proveedor",
-        invoice_number: "Factura", total_amount: "Monto", note: "Nota",
+        invoice_number: "Factura", total_amount: "Monto", note: "Nota", job_title: "Cargo",
     };
 
-    // ... (MANTÉN TU MODULE_CONFIG IGUAL) ...
+    // Campos permitidos por módulo
     const MODULE_CONFIG: Record<string, string[]> = {
-        'Dispositivo': ['inventory_code', 'status'],
-        'Usuario': ['name', 'email', 'is_active', 'role_id'],
-        'Empleado': ['name', 'status', 'job_title', 'unit_id'],
+        'Dispositivo': ['inventory_code', 'status', 'brand', 'model', 'comments'],
+        'Usuario': ['name', 'email', 'is_active'],
+        'Empleado': ['name', 'status', 'job_title'],
         'Compra': ['provider', 'invoice_number', 'total_amount'],
         'Unidad': ['name'], 'Rol': ['name'], 'Categoría': ['name'],
-        'Asignación': ['employee_id', 'device_id', 'note', 'status'],
+        'Asignación': ['note', 'status'],
         'default': ['name', 'inventory_code']
     };
 
-    // ... (MANTÉN TUS FUNCIONES AUXILIARES: getFieldLabel, isTechnicalID, formatAuditValue, formatDate, getEventBadge, formatModel, renderDetails IGUALES) ...
-    const getFieldLabel = (key: string) => FIELD_TRANSLATIONS[key] || key.replace(/_/g, " ");
-    const isTechnicalID = (value: any) => typeof value === 'string' && value.length > 15 && /\d/.test(value) && /[a-zA-Z]/.test(value);
 
-    // [Aquí iría tu función formatAuditValue completa...]
+
+    const getFieldLabel = (key: string) => FIELD_TRANSLATIONS[key] || key.replace(/_/g, " ");
+
+    // Formatear valores de auditoría - más limpio
     const formatAuditValue = (key: string, value: any) => {
         if (value === null || value === "" || value === undefined || value === "null") return null;
+
+        // Ocultar IDs técnicos (UUIDs largos) pero NO los nombres resueltos
+        const isTechnicalID = typeof value === 'string' && value.length > 30 && /^[a-f0-9-]+$/i.test(value);
+        if (isTechnicalID) return null;
+
         const isRelationField = ['employee_id', 'device_id', 'role_id', 'unit_id'].includes(key);
-        if (isTechnicalID(value) && !isRelationField && !key.includes('comment')) return null;
-        if (isRelationField && typeof value === 'string' && value.length > 10) {
-            return <Badge variant="outline" className="font-mono text-[10px] text-slate-500 bg-slate-50 border-slate-200 h-5 px-1.5 gap-1"><LinkIcon className="w-2 h-2" />{value.substring(0, 7)}...</Badge>;
+
+        // Para relaciones, mostrar el nombre resuelto con un badge
+        if (isRelationField && typeof value === 'string') {
+            return <Badge variant="outline" className="text-slate-600 border-slate-300 text-xs font-normal">{value}</Badge>;
         }
+
+        // Estados activo/inactivo
         if (key === 'is_active' || typeof value === 'boolean') {
-            return value ? <span className="text-green-600 font-bold text-[10px]">ACTIVO</span> : <span className="text-red-600 font-bold text-[10px]">INACTIVO</span>;
+            return value ? (
+                <Badge className="bg-green-100 text-green-700 border-green-200 shadow-none text-[10px] font-semibold">ACTIVO</Badge>
+            ) : (
+                <Badge className="bg-red-100 text-red-700 border-red-200 shadow-none text-[10px] font-semibold">INACTIVO</Badge>
+            );
         }
-        if (typeof value === 'string' && value.length > 30) {
-            return <TooltipProvider><Tooltip><TooltipTrigger asChild><span className="cursor-help border-b border-dotted border-slate-400 max-w-[200px] truncate block text-slate-700">{value}</span></TooltipTrigger><TooltipContent className="max-w-[300px] bg-slate-900 text-white text-xs p-2"><p>{value}</p></TooltipContent></Tooltip></TooltipProvider>;
+
+        // Texto largo con tooltip
+        if (typeof value === 'string' && value.length > 25) {
+            return (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="cursor-help text-slate-700 max-w-[150px] truncate block text-xs">
+                                {value.substring(0, 25)}...
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[300px] bg-slate-900 text-white text-xs p-2">
+                            <p>{value}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            );
         }
-        return <span className="text-slate-700 font-medium text-xs">{String(value)}</span>;
+
+        return <span className="text-slate-700 text-xs">{String(value)}</span>;
     };
 
-    const formatDate = (dateString: string) => !dateString ? "-" : new Date(dateString).toLocaleString("es-ES", { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-    const getEventBadge = (event: string) => { /* ... tu código ... */
-        if (event === 'created') return <Badge className="bg-green-50 text-green-700 border-green-200 shadow-none px-2 py-0.5 text-[10px]">Creación</Badge>;
-        if (event === 'updated') return <Badge className="bg-blue-50 text-blue-700 border-blue-200 shadow-none px-2 py-0.5 text-[10px]">Edición</Badge>;
-        return <Badge className="bg-red-50 text-red-700 border-red-200 shadow-none px-2 py-0.5 text-[10px]">Eliminación</Badge>;
+    // Formato de fecha
+    const formatDate = (dateString: string) => {
+        if (!dateString) return "-";
+        return new Date(dateString).toLocaleString("es-ES", {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
     };
-    const formatModel = (model: string) => { /* ... tu código ... */
+
+    const getEventBadge = (event: string) => {
+        if (event === 'created') return <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 shadow-none px-2.5 py-0.5 text-[10px] font-medium">Creación</Badge>;
+        if (event === 'updated') return <Badge className="bg-blue-50 text-blue-700 border-blue-200 shadow-none px-2.5 py-0.5 text-[10px] font-medium">Edición</Badge>;
+        return <Badge className="bg-red-50 text-red-700 border-red-200 shadow-none px-2.5 py-0.5 text-[10px] font-medium">Eliminación</Badge>;
+    };
+
+    const formatModel = (model: string) => {
         const cleanName = model.split('\\').pop() || model;
-        const translations: Record<string, string> = { 'Device': 'Dispositivo', 'Assignment': 'Asignación', 'User': 'Usuario', 'Role': 'Rol', 'Employee': 'Empleado', 'Unit': 'Unidad', 'Category': 'Categoría', 'Purchase': 'Compra' };
+        const translations: Record<string, string> = {
+            'Device': 'Dispositivo', 'Assignment': 'Asignación', 'User': 'Usuario',
+            'Role': 'Rol', 'Employee': 'Empleado', 'Unit': 'Unidad',
+            'Category': 'Categoría', 'Purchase': 'Compra'
+        };
         return translations[cleanName] || cleanName;
     };
 
-    // [Aquí iría tu función renderDetails completa...]
+
+
+    // Renderizar detalles del cambio - versión mejorada
     const renderDetails = (log: any) => {
-        // ... (Pega aquí el mismo renderDetails que ya tienes limpio y optimizado) ...
         const oldVal = log.old_values || {};
         const newVal = log.new_values || {};
         const modelName = formatModel(log.auditable_type);
         const allowedFields = MODULE_CONFIG[modelName] || MODULE_CONFIG['default'];
-        const changes: any[] = [];
 
-        if (modelName === 'Asignación' && log.event === 'created') return newVal['note'] ? <div key="note" className="text-xs text-slate-600"><span className="font-bold">Nota:</span> {newVal['note']}</div> : <span className="text-xs text-slate-500 italic">Asignación realizada (Ver detalle en ficha)</span>;
+        // Para asignaciones - mostrar mensaje simple
+        if (modelName === 'Asignación') {
+            if (log.event === 'created') {
+                return <span className="text-xs text-emerald-600 font-medium">Nueva asignación realizada</span>;
+            }
+            return <span className="text-xs text-slate-500">Asignación actualizada</span>;
+        }
 
         if (log.event === 'created') {
+            const items: any[] = [];
             Object.keys(newVal).forEach(key => {
                 if (!allowedFields.includes(key)) return;
                 const formattedVal = formatAuditValue(key, newVal[key]);
                 if (!formattedVal) return;
-                changes.push(<div key={key} className="inline-flex items-center gap-1.5 mr-2 mb-1 bg-slate-50 px-2 py-1 rounded border border-slate-100"><span className="font-bold text-slate-500 text-[9px] uppercase">{getFieldLabel(key)}</span><span className="text-slate-300">|</span>{formattedVal}</div>);
+                items.push(
+                    <div key={key} className="inline-flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md border border-slate-100 mr-1.5 mb-1">
+                        <span className="font-semibold text-slate-500 text-[10px] uppercase tracking-wide">{getFieldLabel(key)}</span>
+                        {formattedVal}
+                    </div>
+                );
             });
-            return changes.length > 0 ? <div className="flex flex-wrap items-center"><Plus className="w-3 h-3 text-green-500 mr-1.5" />{changes}</div> : <span className="text-xs text-slate-400 italic">Registro creado</span>;
+
+            return items.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-1">
+                    <Plus className="w-3 h-3 text-emerald-500 mr-1" />
+                    {items}
+                </div>
+            ) : (
+                <span className="text-xs text-slate-400 italic">Registro creado</span>
+            );
         }
 
+        // Para actualizaciones - mostrar cambios
+        const changes: any[] = [];
         Object.keys(newVal).forEach(key => {
             if (['updated_at', 'created_at', 'id'].includes(key)) return;
+
+            // Filtrar campos técnicos no relevantes
             const isRelationField = ['employee_id', 'device_id', 'role_id', 'unit_id'].includes(key);
             if (key.endsWith('_id') && !isRelationField) return;
+
             if (JSON.stringify(oldVal[key]) !== JSON.stringify(newVal[key])) {
                 const valOld = formatAuditValue(key, oldVal[key]);
                 const valNew = formatAuditValue(key, newVal[key]);
                 if (!valNew && !valOld) return;
-                changes.push(<div key={key} className="flex items-center gap-2 text-xs mb-1 last:mb-0"><span className="font-bold text-slate-600 w-[80px] shrink-0 truncate text-right">{getFieldLabel(key)}:</span><div className="flex items-center gap-1.5 min-w-0 bg-white border border-slate-100 px-2 py-0.5 rounded shadow-sm"><span className="text-slate-400 line-through max-w-[100px] truncate">{valOld || <span className="italic text-[10px]">vacío</span>}</span><ArrowRight className="w-3 h-3 text-slate-300 mx-1" /><span className="text-slate-800 font-medium max-w-[120px] truncate">{valNew || <span className="italic text-[10px]">vacío</span>}</span></div></div>);
+
+                changes.push(
+                    <div key={key} className="flex items-center gap-2 py-1">
+                        <span className="font-semibold text-slate-600 text-xs min-w-[70px]">{getFieldLabel(key)}:</span>
+                        <div className="flex items-center gap-2 bg-white border border-slate-100 px-2 py-1 rounded-md">
+                            <span className="text-slate-400 line-through text-xs">{valOld || <em className="text-[10px] not-italic">vacío</em>}</span>
+                            <ArrowRight className="w-3 h-3 text-slate-300" />
+                            {valNew || <em className="text-slate-400 text-[10px] not-italic">vacío</em>}
+                        </div>
+                    </div>
+                );
             }
         });
-        return changes.length > 0 ? <div className="flex flex-col gap-1">{changes}</div> : <span className="text-xs text-slate-400">Actualización interna</span>;
+
+        return changes.length > 0 ? (
+            <div className="flex flex-col">{changes}</div>
+        ) : (
+            <span className="text-xs text-slate-400 italic">Actualización de sistema</span>
+        );
     };
 
     // --- ESTADOS ---
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchText, setSearchText] = useState("");
+    const [dateFilter, setDateFilter] = useState("");
+    const [moduleFilter, setModuleFilter] = useState("all");
+    const [eventFilter, setEventFilter] = useState("all");
 
-    // --- NUEVO ESTADO PARA PAGINACIÓN ---
     const [pagination, setPagination] = useState({
-        current_page: 1,
-        last_page: 1,
-        total: 0,
-        from: 0,
-        to: 0
+        current_page: 1, last_page: 1, total: 0, from: 0, to: 0
     });
 
-    // --- EFECTO INICIAL ---
-    useEffect(() => {
-        fetchLogs(1); // Cargamos la página 1 al inicio
-    }, []);
-
-    // --- FUNCIÓN DE CARGA MODIFICADA PARA ACEPTAR 'page' ---
-    const fetchLogs = async (page = 1) => {
+    // Función de carga con filtros
+    const fetchLogs = useCallback(async (page = 1) => {
         setLoading(true);
         try {
-            // Enviamos el parámetro ?page=X al backend
-            const res = await api.get(`/audits?page=${page}`);
+            const params = new URLSearchParams();
+            params.append('page', page.toString());
+            if (searchText) params.append('search', searchText);
+            if (dateFilter) params.append('date', dateFilter);
+            if (moduleFilter !== 'all') params.append('module', moduleFilter);
+            if (eventFilter !== 'all') params.append('event', eventFilter);
 
-            // FILTRO DE ASIGNACIONES (Se mantiene)
-            // Nota: Al paginar, res.data ahora contiene metadatos, y los logs están en res.data.data
+            const res = await api.get(`/audits?${params.toString()}`);
             const allLogs = res.data.data;
 
+            // Filtrar asignaciones del cliente por ahora
             const cleanLogs = allLogs.filter((log: any) =>
                 !log.auditable_type.includes('Assignment')
             );
 
             setLogs(cleanLogs);
-
-            // GUARDAMOS LA DATA DE PAGINACIÓN
             setPagination({
                 current_page: res.data.current_page,
                 last_page: res.data.last_page,
@@ -151,40 +229,111 @@ export default function AuditsPage() {
                 from: res.data.from,
                 to: res.data.to
             });
-
         } catch (error) {
             console.error("Error cargando auditoría", error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchText, dateFilter, moduleFilter, eventFilter]);
 
-    // --- MANEJO DE CAMBIO DE PÁGINA ---
+    // Efecto con debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchLogs(1);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [fetchLogs]);
+
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= pagination.last_page) {
             fetchLogs(newPage);
         }
     };
 
+    const clearFilters = () => {
+        setSearchText("");
+        setDateFilter("");
+        setModuleFilter("all");
+        setEventFilter("all");
+    };
+
+    const hasActiveFilters = !!(searchText || dateFilter || moduleFilter !== 'all' || eventFilter !== 'all');
+
     return (
         <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
+            {/* HEADER */}
             <div>
                 <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                     <FileText className="h-6 w-6 text-blue-600" />
                     Auditoría de Datos
                 </h1>
+                <p className="text-slate-500 text-sm mt-1">Historial de cambios y movimientos del sistema</p>
             </div>
 
-            <Card className="shadow-sm border-slate-200 bg-white">
-                <CardHeader className="pb-3 border-b border-slate-100 bg-slate-50/30">
+            {/* FILTROS */}
+            <DataFilters
+                searchValue={searchText}
+                onSearchChange={setSearchText}
+                searchPlaceholder="Buscar por responsable..."
+                searchColSpan="md:col-span-3"
+                hasActiveFilters={hasActiveFilters}
+                onClear={clearFilters}
+                clearColSpan="md:col-span-1"
+            >
+                <div className="col-span-1 md:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Módulo</span>
+                    <Select value={moduleFilter} onValueChange={setModuleFilter}>
+                        <SelectTrigger className="bg-white w-full">
+                            <SelectValue placeholder="Todos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todos los módulos</SelectItem>
+                            <SelectItem value="User">👤 Usuario</SelectItem>
+                            <SelectItem value="Role">🛡️ Rol</SelectItem>
+                            <SelectItem value="Device">💻 Dispositivo</SelectItem>
+                            <SelectItem value="Employee">👔 Empleado</SelectItem>
+                            <SelectItem value="Unit">🏢 Unidad</SelectItem>
+                            <SelectItem value="Category">📁 Categoría</SelectItem>
+                            <SelectItem value="Purchase">🛒 Compra</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="col-span-1 md:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Acción</span>
+                    <Select value={eventFilter} onValueChange={setEventFilter}>
+                        <SelectTrigger className="bg-white w-full">
+                            <SelectValue placeholder="Todas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todas las acciones</SelectItem>
+                            <SelectItem value="created">✅ Creación</SelectItem>
+                            <SelectItem value="updated">✏️ Edición</SelectItem>
+                            <SelectItem value="deleted">🗑️ Eliminación</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="col-span-1 md:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Fecha</span>
+                    <Input
+                        type="date"
+                        className="bg-white w-full"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                    />
+                </div>
+            </DataFilters>
+
+            {/* TABLA */}
+            <Card className="shadow-sm border-slate-200 bg-white overflow-hidden">
+                <CardHeader className="pb-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                             <AlertCircle className="w-4 h-4" /> Movimientos del Sistema
                         </CardTitle>
-
-                        {/* Indicador de Resultados (Ej: Mostrando 1-15 de 50) */}
                         <span className="text-xs text-slate-400">
-                            Mostrando {pagination.from || 0} - {pagination.to || 0} de {pagination.total} registros
+                            {pagination.from || 0} - {pagination.to || 0} de {pagination.total} registros
                         </span>
                     </div>
                 </CardHeader>
@@ -193,11 +342,11 @@ export default function AuditsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow className="hover:bg-transparent bg-slate-50/50">
-                                <TableHead className="font-semibold text-slate-700 text-xs w-[180px]">RESPONSABLE</TableHead>
-                                <TableHead className="font-semibold text-slate-700 text-xs w-[100px]">ACCIÓN</TableHead>
-                                <TableHead className="font-semibold text-slate-700 text-xs w-[120px]">MÓDULO</TableHead>
-                                <TableHead className="font-semibold text-slate-700 text-xs">DETALLES DEL CAMBIO</TableHead>
-                                <TableHead className="text-right font-semibold text-slate-700 text-xs w-[140px]">FECHA</TableHead>
+                                <TableHead className="font-semibold text-slate-700 text-xs w-[160px]">RESPONSABLE</TableHead>
+                                <TableHead className="font-semibold text-slate-700 text-xs w-[90px]">ACCIÓN</TableHead>
+                                <TableHead className="font-semibold text-slate-700 text-xs w-[130px]">MÓDULO</TableHead>
+                                <TableHead className="font-semibold text-slate-700 text-xs">DETALLES</TableHead>
+                                <TableHead className="text-right font-semibold text-slate-700 text-xs w-[100px]">FECHA</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -207,29 +356,30 @@ export default function AuditsPage() {
                                 <TableRow><TableCell colSpan={5} className="h-24 text-center text-slate-500 text-xs">Sin registros.</TableCell></TableRow>
                             ) : (
                                 logs.map((log) => (
-                                    <TableRow key={log.id} className="hover:bg-slate-50/60 group">
-                                        {/* ... (TUS CELDAS DE TABLA SE MANTIENEN IGUAL) ... */}
-                                        <TableCell className="align-top py-3">
-                                            <div className="flex items-center gap-2">
-                                                <div className="h-6 w-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100">
-                                                    <User className="w-3 h-3" />
+                                    <TableRow key={log.id} className="hover:bg-blue-50/30 group border-b border-slate-50">
+                                        <TableCell className="py-4">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-600 flex items-center justify-center border border-indigo-200/50">
+                                                    <User className="w-4 h-4" />
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-slate-800 text-xs">
-                                                        {log.user ? log.user.name : "Sistema"}
-                                                    </span>
-                                                </div>
+                                                <span className="font-medium text-slate-800 text-sm">
+                                                    {log.user ? log.user.name : "Sistema"}
+                                                </span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="align-top py-3">{getEventBadge(log.event)}</TableCell>
-                                        <TableCell className="align-top py-3">
-                                            <div className="flex items-center gap-1.5 text-slate-600">
-                                                <LayoutGrid className="w-3.5 h-3.5 text-slate-400" />
-                                                <span className="text-xs font-medium">{formatModel(log.auditable_type)}</span>
+                                        <TableCell className="py-4">{getEventBadge(log.event)}</TableCell>
+                                        <TableCell className="py-4">
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-xs font-medium text-slate-600">{formatModel(log.auditable_type)}</span>
+                                                {log.auditable_name && (
+                                                    <span className="text-[11px] text-slate-400">{log.auditable_name}</span>
+                                                )}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="align-top py-3">{renderDetails(log)}</TableCell>
-                                        <TableCell className="text-right text-slate-400 text-[11px] align-top py-3 font-mono">{formatDate(log.created_at)}</TableCell>
+                                        <TableCell className="py-4">{renderDetails(log)}</TableCell>
+                                        <TableCell className="text-right py-4 text-slate-500 text-xs whitespace-nowrap">
+                                            {formatDate(log.created_at)}
+                                        </TableCell>
                                     </TableRow>
                                 ))
                             )}
@@ -237,14 +387,11 @@ export default function AuditsPage() {
                     </Table>
                 </CardContent>
 
-                {/* --- FOOTER CON PAGINACIÓN --- */}
+                {/* PAGINACIÓN */}
                 <div className="flex items-center justify-end p-4 border-t border-slate-100 bg-slate-50/30 gap-2">
-                    <div className="flex items-center gap-1 mr-4">
-                        <span className="text-xs text-slate-500">
-                            Página <span className="font-medium text-slate-900">{pagination.current_page}</span> de <span className="font-medium text-slate-900">{pagination.last_page}</span>
-                        </span>
-                    </div>
-
+                    <span className="text-xs text-slate-500 mr-4">
+                        Página <span className="font-medium text-slate-900">{pagination.current_page}</span> de <span className="font-medium text-slate-900">{pagination.last_page}</span>
+                    </span>
                     <Button
                         variant="outline"
                         size="sm"
@@ -254,7 +401,6 @@ export default function AuditsPage() {
                     >
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-
                     <Button
                         variant="outline"
                         size="sm"
@@ -265,7 +411,6 @@ export default function AuditsPage() {
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
-
             </Card>
         </div>
     );
