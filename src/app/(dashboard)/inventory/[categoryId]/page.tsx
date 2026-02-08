@@ -16,10 +16,13 @@ import { EditDeviceDialog } from "@/components/inventory/EditDeviceDialog";
 import { DataFilters } from "@/components/common/DataFilters";
 import { DeviceHistoryDialog } from "@/components/inventory/DeviceHistoryDialog";
 import { PrintReportDialog } from "@/components/reports/PrintReportDialog";
-// 2. Importar el componente de acciones (Asegúrate de haber creado este archivo antes)
 import { InventoryTableActions } from "@/components/inventory/InventoryTableActions";
+import { canManageSystem } from "@/lib/permissions";
+import { useAuth } from "../../../../hooks/useAuth";
 
 export default function CategoryDetailPage() {
+    const { user } = useAuth(); // Obtener usuario logueado
+    const isSuperAdmin = canManageSystem(user?.role?.name);
     const { categoryId } = useParams();
     const router = useRouter();
 
@@ -156,16 +159,28 @@ export default function CategoryDetailPage() {
                         categoryName={category?.name || "Inventario"}
                     />
 
-                    <Button
+                    {/* <Button
                         variant="outline"
                         onClick={() => setIsAddColumnOpen(true)}
                         className="border-blue-200 text-blue-700 hover:bg-blue-50"
                     >
                         <Columns className="mr-2 h-4 w-4" /> Agregar Columna
-                    </Button>
+                    </Button> */}
+
+                    {isSuperAdmin && (
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsAddColumnOpen(true)}
+                            className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                        >
+                            <Columns className="mr-2 h-4 w-4" /> Agregar Columna
+                        </Button>
+                    )}
+
+
 
                     <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
-                        <Plus className="mr-2 h-4 w-4" /> Registrar {category?.name}
+                        <Plus className="mr-2 h-4 w-4" />
                     </Button>
                 </div>
             </div>
