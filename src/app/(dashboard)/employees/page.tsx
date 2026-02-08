@@ -5,9 +5,11 @@ import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Users, Plus, Search, Trash2, Pencil, Laptop, Briefcase } from "lucide-react";
+import {
+    Users, Plus, Search, Trash2, Pencil, Laptop, Briefcase,
+    ChevronLeft, ChevronRight // Iconos para paginación
+} from "lucide-react";
 import Swal from "sweetalert2";
 import { CreateEmployeeDialog } from "@/components/employees/CreateEmployeeDialog";
 import { EditEmployeeDialog } from "@/components/employees/EditEmployeeDialog";
@@ -18,6 +20,15 @@ export default function EmployeesPage() {
     const [employees, setEmployees] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // --- NUEVO ESTADO PARA PAGINACIÓN ---
+    const [pagination, setPagination] = useState({
+        current_page: 1,
+        last_page: 1,
+        total: 0,
+        from: 0,
+        to: 0
+    });
+
     const [search, setSearch] = useState("");
     const [unitFilter, setUnitFilter] = useState("");
     const [units, setUnits] = useState<any[]>([]);
@@ -26,6 +37,7 @@ export default function EmployeesPage() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedEmp, setSelectedEmp] = useState<any>(null);
 
+    // Carga inicial de unidades
     useEffect(() => {
         const fetchUnits = async () => {
             try {
@@ -40,27 +52,50 @@ export default function EmployeesPage() {
         fetchUnits();
     }, []);
 
-    const fetchEmployees = useCallback(async () => {
+    // --- CARGA DE EMPLEADOS CON PAGINACIÓN ---
+    const fetchEmployees = useCallback(async (page = 1) => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            if (search) params.append("search", search);
+            params.append("page", page.toString()); // Enviamos la página al backend
 
+            if (search) params.append("search", search);
             if (unitFilter && unitFilter !== "all") params.append("unit_id", unitFilter);
 
             const res = await api.get(`/employees?${params.toString()}`);
-            setEmployees(res.data.data || res.data);
+
+            // Laravel paginate devuelve: { data: [...], current_page: 1, ... }
+            // Si el backend aún no tiene paginate(), esto fallará, asegúrate de cambiar el backend primero.
+            setEmployees(res.data.data || []);
+
+            setPagination({
+                current_page: res.data.current_page || 1,
+                last_page: res.data.last_page || 1,
+                total: res.data.total || 0,
+                from: res.data.from || 0,
+                to: res.data.to || 0
+            });
+
         } catch (error) {
             console.error(error);
+            setEmployees([]);
         } finally {
             setLoading(false);
         }
     }, [search, unitFilter]);
 
+    // Efecto Debounce para búsqueda (Vuelve a página 1)
     useEffect(() => {
-        const timer = setTimeout(() => fetchEmployees(), 300);
+        const timer = setTimeout(() => fetchEmployees(1), 300);
         return () => clearTimeout(timer);
     }, [fetchEmployees]);
+
+    // --- MANEJO DE CAMBIO DE PÁGINA ---
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= pagination.last_page) {
+            fetchEmployees(newPage);
+        }
+    };
 
     const handleEdit = (emp: any) => {
         setSelectedEmp(emp);
@@ -80,7 +115,7 @@ export default function EmployeesPage() {
                 try {
                     await api.delete(`/employees/${id}`);
                     Swal.fire("Eliminado", "Empleado eliminado correctamente.", "success");
-                    fetchEmployees();
+                    fetchEmployees(pagination.current_page); // Recargamos la misma página
                 } catch (error: any) {
                     Swal.fire("Error", error.response?.data?.message || "Error al eliminar", "error");
                 }
@@ -90,6 +125,7 @@ export default function EmployeesPage() {
 
     const clearFilters = () => {
         setSearch("");
+        setUnitFilter(""); // También limpiamos el filtro de unidad
     };
 
     return (
@@ -128,7 +164,7 @@ export default function EmployeesPage() {
                         <SelectContent>
                             <SelectItem value="all">Todas</SelectItem>
                             {Array.isArray(units) && units.map((unit) => (
-                                <SelectItem key={unit.id} value={unit.id}>
+                                <SelectItem key={unit.id} value={unit.id.toString()}>
                                     {unit.name}
                                 </SelectItem>
                             ))}
@@ -153,49 +189,40 @@ export default function EmployeesPage() {
                         </TableHeader>
                         <TableBody>
                             {loading ? (
-                                <TableRow><TableCell colSpan={6} className="h-24 text-center">Cargando...</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={6} className="h-24 text-center text-blue-600">Cargando...</TableCell></TableRow>
                             ) : employees.length === 0 ? (
                                 <TableRow><TableCell colSpan={6} className="h-24 text-center text-slate-500">No se encontraron empleados.</TableCell></TableRow>
                             ) : (
                                 employees.map((emp) => (
                                     <TableRow key={emp.id} className="hover:bg-slate-50/50">
-
-                                        {/* NOMBRE Y EMAIL JUNTOS */}
                                         <TableCell>
                                             <div className="flex flex-col">
                                                 <span className="font-medium text-slate-900">{emp.name}</span>
                                                 <span className="text-xs text-slate-500">{emp.email || "-"}</span>
                                             </div>
                                         </TableCell>
-
-                                        {/* CARGO */}
                                         <TableCell className="text-slate-600 text-sm">
                                             <div className="flex items-center gap-2">
                                                 <Briefcase className="w-3 h-3 text-slate-400" />
                                                 {emp.job_title || "N/A"}
                                             </div>
                                         </TableCell>
-
                                         <TableCell>
                                             <Badge variant="outline" className="text-slate-600 border-slate-300">
                                                 {emp.unit?.name || "Sin Unidad"}
                                             </Badge>
                                         </TableCell>
-
                                         <TableCell>
-                                            {/* Usamos el booleano 'status' (true/false) */}
                                             <Badge className={emp.status ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-red-100 text-red-700 hover:bg-red-200"}>
                                                 {emp.status ? "Activo" : "Inactivo"}
                                             </Badge>
                                         </TableCell>
-
                                         <TableCell className="text-center">
                                             <div className="flex items-center justify-center gap-1 text-slate-600 font-medium">
                                                 <Laptop className="w-4 h-4 text-blue-500" />
                                                 {emp.devices_count || 0}
                                             </div>
                                         </TableCell>
-
                                         <TableCell className="text-right space-x-1">
                                             <Button variant="ghost" size="icon" onClick={() => handleEdit(emp)}>
                                                 <Pencil className="w-4 h-4 text-slate-400 hover:text-blue-600" />
@@ -209,20 +236,54 @@ export default function EmployeesPage() {
                             )}
                         </TableBody>
                     </Table>
+
+                    {/* --- FOOTER PAGINACIÓN --- */}
+                    <div className="flex items-center justify-end p-4 border-t border-slate-100 bg-slate-50/30 gap-2">
+                        <div className="flex items-center gap-1 mr-4">
+                            <span className="text-xs text-slate-500">
+                                Mostrando {pagination.from || 0} - {pagination.to || 0} de {pagination.total}
+                            </span>
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(pagination.current_page - 1)}
+                            disabled={pagination.current_page === 1 || loading}
+                            className="h-8 w-8 p-0"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+
+                        <span className="text-xs font-medium text-slate-700 w-16 text-center">
+                            Pág {pagination.current_page} de {pagination.last_page}
+                        </span>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(pagination.current_page + 1)}
+                            disabled={pagination.current_page === pagination.last_page || loading}
+                            className="h-8 w-8 p-0"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+
                 </CardContent>
             </Card>
 
             <CreateEmployeeDialog
                 open={isCreateOpen}
                 onOpenChange={setIsCreateOpen}
-                onSuccess={fetchEmployees}
+                onSuccess={() => fetchEmployees(1)} // Al crear, volvemos a la página 1
             />
 
             <EditEmployeeDialog
                 open={isEditOpen}
                 onOpenChange={setIsEditOpen}
                 employee={selectedEmp}
-                onSuccess={fetchEmployees}
+                onSuccess={() => fetchEmployees(pagination.current_page)} // Al editar, nos quedamos en la misma
             />
         </div>
     );
