@@ -29,16 +29,16 @@ export function DataFilters({
     className,
 }: DataFiltersProps) {
     return (
-        <Card className={cn("bg-slate-50 border-slate-200", className)}>
+        <Card className={cn("bg-slate-50 border-slate-200 dark:bg-slate-800/50 dark:border-slate-700", className)}>
             <CardContent className="p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
 
                 <div className={cn("col-span-1 space-y-1", searchColSpan)}>
-                    <span className="text-xs font-medium text-slate-500 ml-1">Búsqueda</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 ml-1">Búsqueda</span>
                     <div className="relative">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
                         <Input
                             placeholder={searchPlaceholder}
-                            className="pl-8 bg-white"
+                            className="pl-8 bg-white dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 dark:placeholder:text-slate-500"
                             value={searchValue}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
@@ -51,7 +51,7 @@ export function DataFilters({
                     {hasActiveFilters && (
                         <Button
                             variant="ghost"
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 w-full md:w-auto px-2"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 w-full md:w-auto px-2"
                             onClick={onClear}
                             title="Limpiar filtros"
                         >

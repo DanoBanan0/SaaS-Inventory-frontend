@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Plus, Search, Trash2, Pencil, Package, X, Calendar as CalendarIcon } from "lucide-react";
+import { ShoppingCart, Plus, Trash2, Pencil, Package } from "lucide-react";
 import Swal from "sweetalert2";
 import { CreatePurchaseDialog } from "@/components/purchases/CreatePurchaseDialog";
 import { EditPurchaseDialog } from "@/components/purchases/EditPurchaseDialog";

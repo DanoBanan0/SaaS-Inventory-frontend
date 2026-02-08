@@ -22,6 +22,7 @@ import { PrintReportDialog } from "@/components/reports/PrintReportDialog";
 import { InventoryTableActions } from "@/components/inventory/InventoryTableActions";
 import { canManageSystem } from "@/lib/permissions";
 import { useAuth } from "@/hooks/useAuth";
+import { ExportButton } from "@/components/common/ExportButton";
 
 export default function CategoryDetailPage() {
     const { categoryId } = useParams();
@@ -170,6 +171,13 @@ export default function CategoryDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    <ExportButton
+                        data={devices}
+                        columns={['inventory_code', 'brand', 'model', 'serial_number', 'status']}
+                        headers={['N° Inventario', 'Marca', 'Modelo', 'Serie', 'Estado']}
+                        filename={`inventario_${category?.name || 'dispositivos'}`}
+                        disabled={loading}
+                    />
                     <InventoryTableActions
                         tableRef={tableRef}
                         data={devices}
@@ -233,7 +241,7 @@ export default function CategoryDetailPage() {
             {/* TABLA DE RESULTADOS */}
             <Card>
                 <CardContent className="p-0 overflow-x-auto">
-                    <div ref={tableRef}>
+                    <div ref={tableRef} className="print-container">
                         <Table>
                             <TableHeader className="bg-slate-100">
                                 <TableRow>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,30 +17,9 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { DataFilters } from "@/components/common/DataFilters";
+import { FIELD_TRANSLATIONS, MODULE_CONFIG, MODEL_TRANSLATIONS } from "@/lib/constants";
 
 export default function AuditsPage() {
-
-    // Traducciones de campos
-    const FIELD_TRANSLATIONS: Record<string, string> = {
-        is_active: "Estado", comments: "Comentario", name: "Nombre", email: "Correo",
-        role_id: "Rol", employee_id: "Empleado", device_id: "Equipo",
-        unit_id: "Unidad", inventory_code: "N° Inventario", brand: "Marca",
-        model: "Modelo", serial_number: "Serie", status: "Estado", provider: "Proveedor",
-        invoice_number: "Factura", total_amount: "Monto", note: "Nota", job_title: "Cargo",
-    };
-
-    // Campos permitidos por módulo
-    const MODULE_CONFIG: Record<string, string[]> = {
-        'Dispositivo': ['inventory_code', 'status', 'brand', 'model', 'comments'],
-        'Usuario': ['name', 'email', 'is_active'],
-        'Empleado': ['name', 'status', 'job_title'],
-        'Compra': ['provider', 'invoice_number', 'total_amount'],
-        'Unidad': ['name'], 'Rol': ['name'], 'Categoría': ['name'],
-        'Asignación': ['note', 'status'],
-        'default': ['name', 'inventory_code']
-    };
-
-
 
     const getFieldLabel = (key: string) => FIELD_TRANSLATIONS[key] || key.replace(/_/g, " ");
 
@@ -106,12 +85,7 @@ export default function AuditsPage() {
 
     const formatModel = (model: string) => {
         const cleanName = model.split('\\').pop() || model;
-        const translations: Record<string, string> = {
-            'Device': 'Dispositivo', 'Assignment': 'Asignación', 'User': 'Usuario',
-            'Role': 'Rol', 'Employee': 'Empleado', 'Unit': 'Unidad',
-            'Category': 'Categoría', 'Purchase': 'Compra'
-        };
-        return translations[cleanName] || cleanName;
+        return MODEL_TRANSLATIONS[cleanName] || cleanName;
     };
 
 
@@ -275,10 +249,10 @@ export default function AuditsPage() {
                 clearColSpan="md:col-span-2"
             >
                 <div className="col-span-1 md:col-span-3 space-y-1">
-                    <span className="text-xs font-medium text-slate-500 ml-1">Fecha</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 ml-1">Fecha</span>
                     <Input
                         type="date"
-                        className="bg-white w-full"
+                        className="bg-white dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 w-full"
                         value={dateFilter}
                         onChange={(e) => setDateFilter(e.target.value)}
                     />
@@ -286,13 +260,13 @@ export default function AuditsPage() {
             </DataFilters>
 
             {/* TABLA */}
-            <Card className="shadow-sm border-slate-200 bg-white overflow-hidden">
-                <CardHeader className="pb-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+            <Card className="shadow-sm border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+                <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900">
                     <div className="flex justify-between items-center">
-                        <CardTitle className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                        <CardTitle className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <AlertCircle className="w-4 h-4" /> Movimientos del Sistema
                         </CardTitle>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
                             {pagination.from || 0} - {pagination.to || 0} de {pagination.total} registros
                         </span>
                     </div>
@@ -301,12 +275,12 @@ export default function AuditsPage() {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="hover:bg-transparent bg-slate-50/50">
-                                <TableHead className="font-semibold text-slate-700 text-xs w-[160px]">RESPONSABLE</TableHead>
-                                <TableHead className="font-semibold text-slate-700 text-xs w-[90px]">ACCIÓN</TableHead>
-                                <TableHead className="font-semibold text-slate-700 text-xs w-[130px]">MÓDULO</TableHead>
-                                <TableHead className="font-semibold text-slate-700 text-xs">DETALLES</TableHead>
-                                <TableHead className="text-right font-semibold text-slate-700 text-xs w-[100px]">FECHA</TableHead>
+                            <TableRow className="hover:bg-transparent bg-slate-50/50 dark:bg-slate-800/50">
+                                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-xs w-[160px]">RESPONSABLE</TableHead>
+                                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-xs w-[90px]">ACCIÓN</TableHead>
+                                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-xs w-[130px]">MÓDULO</TableHead>
+                                <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-xs">DETALLES</TableHead>
+                                <TableHead className="text-right font-semibold text-slate-700 dark:text-slate-300 text-xs w-[100px]">FECHA</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -316,13 +290,13 @@ export default function AuditsPage() {
                                 <TableRow><TableCell colSpan={5} className="h-24 text-center text-slate-500 text-xs">Sin registros.</TableCell></TableRow>
                             ) : (
                                 logs.map((log) => (
-                                    <TableRow key={log.id} className="hover:bg-blue-50/30 group border-b border-slate-50">
+                                    <TableRow key={log.id} className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 group border-b border-slate-50 dark:border-slate-800">
                                         <TableCell className="py-4">
                                             <div className="flex items-center gap-2.5">
                                                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-600 flex items-center justify-center border border-indigo-200/50">
                                                     <User className="w-4 h-4" />
                                                 </div>
-                                                <span className="font-medium text-slate-800 text-sm">
+                                                <span className="font-medium text-slate-800 dark:text-slate-200 text-sm">
                                                     {log.user ? log.user.name : "Sistema"}
                                                 </span>
                                             </div>
@@ -330,14 +304,14 @@ export default function AuditsPage() {
                                         <TableCell className="py-4">{getEventBadge(log.event)}</TableCell>
                                         <TableCell className="py-4">
                                             <div className="flex flex-col gap-0.5">
-                                                <span className="text-xs font-medium text-slate-600">{formatModel(log.auditable_type)}</span>
+                                                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{formatModel(log.auditable_type)}</span>
                                                 {log.auditable_name && (
-                                                    <span className="text-[11px] text-slate-400">{log.auditable_name}</span>
+                                                    <span className="text-[11px] text-slate-400 dark:text-slate-500">{log.auditable_name}</span>
                                                 )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-4">{renderDetails(log)}</TableCell>
-                                        <TableCell className="text-right py-4 text-slate-500 text-xs whitespace-nowrap">
+                                        <TableCell className="text-right py-4 text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">
                                             {formatDate(log.created_at)}
                                         </TableCell>
                                     </TableRow>
@@ -348,9 +322,9 @@ export default function AuditsPage() {
                 </CardContent>
 
                 {/* PAGINACIÓN */}
-                <div className="flex items-center justify-end p-4 border-t border-slate-100 bg-slate-50/30 gap-2">
-                    <span className="text-xs text-slate-500 mr-4">
-                        Página <span className="font-medium text-slate-900">{pagination.current_page}</span> de <span className="font-medium text-slate-900">{pagination.last_page}</span>
+                <div className="flex items-center justify-end p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/50 gap-2">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 mr-4">
+                        Página <span className="font-medium text-slate-900 dark:text-slate-100">{pagination.current_page}</span> de <span className="font-medium text-slate-900 dark:text-slate-100">{pagination.last_page}</span>
                     </span>
                     <Button
                         variant="outline"

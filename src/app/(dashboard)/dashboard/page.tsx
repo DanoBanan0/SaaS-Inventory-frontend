@@ -9,7 +9,6 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    // Consumimos el endpoint que creamos en el Backend
     api.get("/dashboard")
       .then((res) => setStats(res.data))
       .catch((err) => console.error("Error cargando dashboard:", err));

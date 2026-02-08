@@ -157,14 +157,6 @@ export default function UsersPage() {
                 </Button>
             </div>
 
-            {/* <DataFilters
-                searchValue={search}
-                onSearchChange={setSearch}
-                clearColSpan="md:col-span-1"
-                hasActiveFilters={!!search}
-                onClear={clearFilters}
-            /> */}
-
             <Card>
                 <CardContent className="p-0 overflow-x-auto">
                     <Table>

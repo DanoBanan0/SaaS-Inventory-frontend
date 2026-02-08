@@ -143,7 +143,6 @@ export default function EmployeesPage() {
                 </Button>
             </div>
 
-            {/* BUSCADOR */}
             <DataFilters
                 searchValue={search}
                 onSearchChange={setSearch}
