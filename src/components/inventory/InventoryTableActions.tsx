@@ -20,68 +20,69 @@ export function InventoryTableActions({ tableRef, categoryName }: InventoryTable
         pageStyle: `
             @page { 
                 size: landscape; 
-                margin: 8mm; 
+                margin: 5mm; 
             }
             @media print {
                 html, body {
                     -webkit-print-color-adjust: exact !important;
                     print-color-adjust: exact !important;
-                    width: 100%;
-                    height: 100%;
-                    margin: 0;
-                    padding: 0;
+                    margin: 0 !important;
+                    padding: 0 !important;
                 }
                 
-                /* Container principal */
+                /* Escalar todo el contenedor para que quepa */
                 .print-container {
                     width: 100% !important;
-                    max-width: 100% !important;
-                    overflow: visible !important;
+                    transform: scale(0.75);
+                    transform-origin: top left;
                 }
                 
-                /* Tabla ajustada al ancho de página */
+                /* Tabla compacta */
                 table {
                     width: 100% !important;
-                    table-layout: fixed !important;
-                    font-size: 9px !important;
+                    table-layout: auto !important;
+                    font-size: 7px !important;
                     border-collapse: collapse !important;
                 }
                 
                 th, td {
-                    padding: 4px 6px !important;
-                    font-size: 9px !important;
-                    word-wrap: break-word !important;
-                    overflow-wrap: break-word !important;
-                    white-space: normal !important;
-                    border: 1px solid #e2e8f0 !important;
+                    padding: 2px 3px !important;
+                    font-size: 7px !important;
+                    white-space: nowrap !important;
+                    border: 0.5px solid #cbd5e1 !important;
+                    max-width: 100px !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
                 }
                 
                 th {
-                    background-color: #f1f5f9 !important;
-                    font-weight: 600 !important;
+                    background-color: #e2e8f0 !important;
+                    font-weight: 700 !important;
                     text-transform: uppercase !important;
-                    font-size: 8px !important;
+                    font-size: 6px !important;
+                    letter-spacing: 0.3px !important;
                 }
                 
                 /* Ocultar columna de acciones */
-                .actions-cell { 
-                    display: none !important; 
+                .actions-cell, 
+                th:last-child, 
+                td:last-child {
+                    display: none !important;
                 }
                 
-                /* Ajustar badges */
+                /* Badges más compactos */
                 .badge, [class*="badge"] {
-                    font-size: 8px !important;
-                    padding: 2px 4px !important;
+                    font-size: 6px !important;
+                    padding: 1px 2px !important;
                 }
                 
                 /* Ocultar elementos innecesarios */
-                button, .no-print {
+                button, .no-print, nav, header {
                     display: none !important;
                 }
                 
                 /* Scroll container visible */
-                [class*="overflow-x-auto"], 
-                [class*="overflow-auto"] {
+                [class*="overflow"] {
                     overflow: visible !important;
                 }
             }
