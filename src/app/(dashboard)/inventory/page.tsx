@@ -6,6 +6,7 @@ import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Box, ChevronRight, Loader2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 // Importaremos el modal aquí abajo en un momento
 import { CreateCategoryDialog } from "@/components/inventory/CreateCategoryDialog";
 import { canManageSystem } from "@/lib/permissions";
@@ -50,14 +51,23 @@ export default function InventoryPage() {
                     </h1>
                 </div>
 
-                {/* Botón que abre el Modal - Solo visible para admin/developer/administrador */}
                 {isSuperAdmin && (
-                    <Button
-                        className="bg-blue-700 hover:bg-blue-800 text-white shadow-lg"
-                        onClick={() => setIsCreateOpen(true)}
-                    >
-                        <Plus className="mr-2 h-4 w-4" /> Nueva Categoría
-                    </Button>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    size="icon"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg h-10 w-10"
+                                    onClick={() => setIsCreateOpen(true)}
+                                >
+                                    <Plus className="h-5 w-5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Nueva Categoría</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 )}
             </div>
 

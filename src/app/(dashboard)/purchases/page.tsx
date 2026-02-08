@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ShoppingCart, Plus, Trash2, Pencil, Package } from "lucide-react";
 import Swal from "sweetalert2";
 import { CreatePurchaseDialog } from "@/components/purchases/CreatePurchaseDialog";
@@ -97,9 +98,22 @@ export default function PurchasesPage() {
                         Registro de Compras
                     </h1>
                 </div>
-                <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
-                    <Plus className="mr-2 h-4 w-4" /> Registrar Factura
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="icon"
+                                onClick={() => setIsCreateOpen(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg h-10 w-10"
+                            >
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Registrar Factura</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
 
             {/* BARRA DE FILTROS (DISEÑO GRID) */}

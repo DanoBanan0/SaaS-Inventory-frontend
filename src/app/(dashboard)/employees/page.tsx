@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     Users, Plus, Search, Trash2, Pencil, Laptop, Briefcase,
     ChevronLeft, ChevronRight // Iconos para paginación
@@ -138,9 +139,22 @@ export default function EmployeesPage() {
                         Directorio de Empleados
                     </h1>
                 </div>
-                <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
-                    <Plus className="mr-2 h-4 w-4" /> Nuevo Empleado
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="icon"
+                                onClick={() => setIsCreateOpen(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg h-10 w-10"
+                            >
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Nuevo Empleado</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
 
             <DataFilters

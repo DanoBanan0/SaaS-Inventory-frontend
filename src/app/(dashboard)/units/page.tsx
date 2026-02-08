@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Building2, Plus, Users, Trash2, Pencil } from "lucide-react";
 import Swal from "sweetalert2";
 import { CreateUnitDialog } from "@/components/organization/CreateUnitDialog";
@@ -83,9 +84,22 @@ export default function UnitsPage() {
                         Unidades Organizativas
                     </h1>
                 </div>
-                <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
-                    <Plus className="mr-2 h-4 w-4" /> Nueva Unidad
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="icon"
+                                onClick={() => setIsCreateOpen(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg h-10 w-10"
+                            >
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Nueva Unidad</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
 
             {/* BUSCADOR IMPLEMENTADO CON DATAFILTERS */}

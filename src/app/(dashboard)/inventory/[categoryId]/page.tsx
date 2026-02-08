@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     ArrowLeft, Plus, HardDrive, Columns, Pencil, History, NotepadText,
     ChevronLeft, ChevronRight // --- CAMBIO: Importar iconos ---
@@ -184,19 +185,40 @@ export default function CategoryDetailPage() {
                         categoryName={category?.name || "Inventario"}
                     />
 
-                    {isSuperAdmin && (
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsAddColumnOpen(true)}
-                            className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                        >
-                            <Columns className="mr-2 h-4 w-4" /> Agregar Columna
-                        </Button>
-                    )}
+                    <TooltipProvider>
+                        {isSuperAdmin && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        size="icon"
+                                        variant="outline"
+                                        onClick={() => setIsAddColumnOpen(true)}
+                                        className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-full h-10 w-10"
+                                    >
+                                        <Columns className="h-5 w-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Agregar Columna</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
 
-                    <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
-                        <Plus className="mr-2 h-4 w-4" /> Registrar {category?.name}
-                    </Button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    size="icon"
+                                    onClick={() => setIsCreateOpen(true)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg h-10 w-10"
+                                >
+                                    <Plus className="h-5 w-5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Registrar {category?.name || 'Dispositivo'}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             </div>
 

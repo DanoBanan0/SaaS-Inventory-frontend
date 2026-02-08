@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { UserCircle, Plus, Search, Ban, Pencil, CheckCircle, Code, User, XCircle, Unlock } from "lucide-react";
 import Swal from "sweetalert2";
 import { CreateUserDialog } from "@/components/users/CreateUserDialog";
@@ -152,9 +153,22 @@ export default function UsersPage() {
                         Usuarios del Sistema
                     </h1>
                 </div>
-                <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-700 hover:bg-blue-800">
-                    <Plus className="mr-2 h-4 w-4" /> Nuevo Usuario
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="icon"
+                                onClick={() => setIsCreateOpen(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg h-10 w-10"
+                            >
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Nuevo Usuario</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
 
             <Card>
