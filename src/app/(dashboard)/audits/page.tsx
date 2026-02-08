@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
     FileText, User, ArrowRight, Plus, AlertCircle, ChevronLeft, ChevronRight
 } from "lucide-react";
@@ -195,8 +194,6 @@ export default function AuditsPage() {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [dateFilter, setDateFilter] = useState("");
-    const [moduleFilter, setModuleFilter] = useState("all");
-    const [eventFilter, setEventFilter] = useState("all");
 
     const [pagination, setPagination] = useState({
         current_page: 1, last_page: 1, total: 0, from: 0, to: 0
@@ -210,11 +207,9 @@ export default function AuditsPage() {
             params.append('page', page.toString());
             if (searchText) params.append('search', searchText);
             if (dateFilter) params.append('date', dateFilter);
-            if (moduleFilter !== 'all') params.append('module', moduleFilter);
-            if (eventFilter !== 'all') params.append('event', eventFilter);
 
             const res = await api.get(`/audits?${params.toString()}`);
-            const allLogs = res.data.data;
+            const allLogs = res.data.data || [];
 
             // Filtrar asignaciones del cliente por ahora
             const cleanLogs = allLogs.filter((log: any) =>
@@ -223,18 +218,19 @@ export default function AuditsPage() {
 
             setLogs(cleanLogs);
             setPagination({
-                current_page: res.data.current_page,
-                last_page: res.data.last_page,
-                total: res.data.total,
-                from: res.data.from,
-                to: res.data.to
+                current_page: res.data.current_page || 1,
+                last_page: res.data.last_page || 1,
+                total: res.data.total || 0,
+                from: res.data.from || 0,
+                to: res.data.to || 0
             });
         } catch (error) {
             console.error("Error cargando auditoría", error);
+            setLogs([]);
         } finally {
             setLoading(false);
         }
-    }, [searchText, dateFilter, moduleFilter, eventFilter]);
+    }, [searchText, dateFilter]);
 
     // Efecto con debounce
     useEffect(() => {
@@ -253,11 +249,9 @@ export default function AuditsPage() {
     const clearFilters = () => {
         setSearchText("");
         setDateFilter("");
-        setModuleFilter("all");
-        setEventFilter("all");
     };
 
-    const hasActiveFilters = !!(searchText || dateFilter || moduleFilter !== 'all' || eventFilter !== 'all');
+    const hasActiveFilters = !!(searchText || dateFilter);
 
     return (
         <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
@@ -275,46 +269,12 @@ export default function AuditsPage() {
                 searchValue={searchText}
                 onSearchChange={setSearchText}
                 searchPlaceholder="Buscar por responsable..."
-                searchColSpan="md:col-span-3"
+                searchColSpan="md:col-span-6"
                 hasActiveFilters={hasActiveFilters}
                 onClear={clearFilters}
-                clearColSpan="md:col-span-1"
+                clearColSpan="md:col-span-2"
             >
-                <div className="col-span-1 md:col-span-2 space-y-1">
-                    <span className="text-xs font-medium text-slate-500 ml-1">Módulo</span>
-                    <Select value={moduleFilter} onValueChange={setModuleFilter}>
-                        <SelectTrigger className="bg-white w-full">
-                            <SelectValue placeholder="Todos" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Todos los módulos</SelectItem>
-                            <SelectItem value="User">👤 Usuario</SelectItem>
-                            <SelectItem value="Role">🛡️ Rol</SelectItem>
-                            <SelectItem value="Device">💻 Dispositivo</SelectItem>
-                            <SelectItem value="Employee">👔 Empleado</SelectItem>
-                            <SelectItem value="Unit">🏢 Unidad</SelectItem>
-                            <SelectItem value="Category">📁 Categoría</SelectItem>
-                            <SelectItem value="Purchase">🛒 Compra</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="col-span-1 md:col-span-2 space-y-1">
-                    <span className="text-xs font-medium text-slate-500 ml-1">Acción</span>
-                    <Select value={eventFilter} onValueChange={setEventFilter}>
-                        <SelectTrigger className="bg-white w-full">
-                            <SelectValue placeholder="Todas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Todas las acciones</SelectItem>
-                            <SelectItem value="created">✅ Creación</SelectItem>
-                            <SelectItem value="updated">✏️ Edición</SelectItem>
-                            <SelectItem value="deleted">🗑️ Eliminación</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="col-span-1 md:col-span-2 space-y-1">
+                <div className="col-span-1 md:col-span-3 space-y-1">
                     <span className="text-xs font-medium text-slate-500 ml-1">Fecha</span>
                     <Input
                         type="date"

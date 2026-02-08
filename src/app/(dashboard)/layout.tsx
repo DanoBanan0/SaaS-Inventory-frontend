@@ -35,7 +35,7 @@ export default function DashboardLayout({
 
                 <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                     <SheetTrigger asChild>
-                        <button className="text-white p-1">
+                        <button className="text-white p-1" suppressHydrationWarning>
                             <Menu className="w-6 h-6" />
                         </button>
                     </SheetTrigger>
