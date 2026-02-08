@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Plus, Box, ChevronRight, Loader2 } from "lucide-react";
 // Importaremos el modal aquí abajo en un momento
 import { CreateCategoryDialog } from "@/components/inventory/CreateCategoryDialog";
+import { canManageSystem } from "@/lib/permissions";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Category {
     id: string;
@@ -16,6 +18,9 @@ interface Category {
 
 export default function InventoryPage() {
     const router = useRouter();
+    const { user } = useAuth();
+    const isSuperAdmin = canManageSystem(user?.role?.name);
+
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false); // Estado para abrir el modal
@@ -45,13 +50,15 @@ export default function InventoryPage() {
                     </h1>
                 </div>
 
-                {/* Botón que abre el Modal */}
-                <Button
-                    className="bg-blue-700 hover:bg-blue-800 text-white shadow-lg"
-                    onClick={() => setIsCreateOpen(true)}
-                >
-                    <Plus className="mr-2 h-4 w-4" /> Nueva Categoría
-                </Button>
+                {/* Botón que abre el Modal - Solo visible para admin/developer/administrador */}
+                {isSuperAdmin && (
+                    <Button
+                        className="bg-blue-700 hover:bg-blue-800 text-white shadow-lg"
+                        onClick={() => setIsCreateOpen(true)}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Nueva Categoría
+                    </Button>
+                )}
             </div>
 
             {/* GRID DE TARJETAS */}
@@ -64,9 +71,11 @@ export default function InventoryPage() {
                     <Box className="mx-auto h-12 w-12 text-slate-300" />
                     <h3 className="mt-2 text-lg font-medium text-slate-900">No hay categorías</h3>
                     <p className="text-sm text-slate-500 mb-4">Empiece definiendo la primera.</p>
-                    <Button variant="outline" onClick={() => setIsCreateOpen(true)}>
-                        Crear Categoría
-                    </Button>
+                    {isSuperAdmin && (
+                        <Button variant="outline" onClick={() => setIsCreateOpen(true)}>
+                            Crear Categoría
+                        </Button>
+                    )}
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

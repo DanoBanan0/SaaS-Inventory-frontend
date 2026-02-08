@@ -12,7 +12,7 @@ export function useAuth() {
             try {
                 // Intenta obtener el usuario logueado.
                 // Si tu backend usa otra ruta (ej: '/auth/user'), cámbiala aquí.
-                const res = await api.get("/user");
+                const res = await api.post("/me");
                 setUser(res.data);
             } catch (error) {
                 // Si falla (no logueado), dejamos user en null

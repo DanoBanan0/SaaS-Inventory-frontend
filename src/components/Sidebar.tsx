@@ -8,6 +8,7 @@ import {
     Users, ShieldCheck, FileText, LogOut, UserCircle, PanelLeftClose
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { canManageSystem } from "@/lib/permissions";
 import Swal from "sweetalert2";
 import api from "@/lib/axios";
 
@@ -114,6 +115,20 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
         },
     ];
 
+    // Filtrar menús según permisos del usuario
+    const isSuperAdmin = canManageSystem(user?.role?.name);
+    const restrictedPaths = ['/users', '/roles', '/audits', '/purchases', '/units'];
+
+    const filteredMenuItems = menuItems.map(section => ({
+        ...section,
+        items: section.items.filter(item => {
+            if (restrictedPaths.includes(item.href)) {
+                return isSuperAdmin;
+            }
+            return true;
+        })
+    })).filter(section => section.items.length > 0);
+
     return (
         <aside className={cn("bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col h-full", className)}>
             <div className="p-6 border-b border-slate-800 bg-slate-950/50">
@@ -149,7 +164,7 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
             </div>
 
             <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
-                {menuItems.map((section, idx) => (
+                {filteredMenuItems.map((section, idx) => (
                     <div key={idx}>
                         <h3 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{section.section}</h3>
                         <div className="space-y-1">
