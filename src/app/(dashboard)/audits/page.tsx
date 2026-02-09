@@ -235,7 +235,6 @@ export default function AuditsPage() {
                     <FileText className="h-6 w-6 text-blue-600" />
                     Auditoría de Datos
                 </h1>
-                <p className="text-slate-500 text-sm mt-1">Historial de cambios y movimientos del sistema</p>
             </div>
 
             {/* FILTROS */}
@@ -275,7 +274,7 @@ export default function AuditsPage() {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="hover:bg-transparent bg-slate-50/50 dark:bg-slate-800/50">
+                            <TableRow className="hover:bg-transparent bg-slate-50 dark:bg-slate-800">
                                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-xs w-[160px]">RESPONSABLE</TableHead>
                                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-xs w-[90px]">ACCIÓN</TableHead>
                                 <TableHead className="font-semibold text-slate-700 dark:text-slate-300 text-xs w-[130px]">MÓDULO</TableHead>
@@ -322,7 +321,7 @@ export default function AuditsPage() {
                 </CardContent>
 
                 {/* PAGINACIÓN */}
-                <div className="flex items-center justify-end p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/50 gap-2">
+                <div className="flex items-center justify-end p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 gap-2">
                     <span className="text-xs text-slate-500 dark:text-slate-400 mr-4">
                         Página <span className="font-medium text-slate-900 dark:text-slate-100">{pagination.current_page}</span> de <span className="font-medium text-slate-900 dark:text-slate-100">{pagination.last_page}</span>
                     </span>

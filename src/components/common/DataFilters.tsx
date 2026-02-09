@@ -29,7 +29,7 @@ export function DataFilters({
     className,
 }: DataFiltersProps) {
     return (
-        <Card className={cn("bg-slate-50 border-slate-200 dark:bg-slate-800/50 dark:border-slate-700", className)}>
+        <Card className={cn("bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-700", className)}>
             <CardContent className="p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
 
                 <div className={cn("col-span-1 space-y-1", searchColSpan)}>

@@ -134,10 +134,14 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
         <aside className={cn("bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col h-full", className)}>
             <div className="p-6 border-b border-slate-800 bg-slate-950/50">
                 <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2 text-white">
-                        <a href="https://inventory-frontend-kappa-ashy.vercel.app/dashboard">
-                            <span className="text-xl font-bold tracking-tight">INDES<span className="text-blue-500">INVENTORY</span></span>
-                        </a>
+                    <div className="flex items-center justify-center flex-1">
+                        <Link href="/dashboard" className="block">
+                            <img
+                                src="/INDES-W.png"
+                                alt="INDES Logo"
+                                className="h-12 w-auto object-contain hover:opacity-80 transition-opacity"
+                            />
+                        </Link>
                     </div>
 
                     {onCollapse && (
@@ -198,6 +202,6 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
                 </button>
                 <ThemeToggle />
             </div>
-        </aside>
+        </aside >
     );
 }

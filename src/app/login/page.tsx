@@ -3,13 +3,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import api from "@/lib/axios"; // Nuestra conexión configurada
+import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import Swal from "sweetalert2"; // Alertas bonitas
-import { Mail, Lock, Loader2, ShieldCheck, CirclePile, Blocks, PackageOpen } from "lucide-react"; // Iconos Lucide
+import Swal from "sweetalert2";
+import { Mail, Lock, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -28,37 +28,33 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            // 1. Petición al Backend
             const response = await api.post("/auth/login", form);
-
-            // 2. Guardar Token y Datos del Usuario
             const { access_token, user } = response.data;
             localStorage.setItem("token", access_token);
             localStorage.setItem("user", JSON.stringify(user));
 
-            // 3. Éxito
             Swal.fire({
                 icon: "success",
                 title: "¡Bienvenido!",
                 text: `Accediendo como ${user.name}...`,
                 timer: 1500,
                 showConfirmButton: false,
-                background: "#f8fafc", // slate-50
-                color: "#0f172a", // slate-900
+                background: "#0f172a",
+                color: "#f8fafc",
             });
 
-            // 4. Redirigir al Dashboard
             router.push("/dashboard");
 
         } catch (error: any) {
             console.error(error);
-            const errorMsg = error.response?.data?.error || "Error al conectar con el servidor";
 
             Swal.fire({
                 icon: "error",
                 title: "Acceso Denegado",
                 text: "",
-                confirmButtonColor: "#1e40af", // blue-800
+                confirmButtonColor: "#1e40af",
+                background: "#0f172a",
+                color: "#f8fafc",
             });
         } finally {
             setLoading(false);
@@ -66,34 +62,36 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-900 px-4">
-            <Card className="w-full max-w-md shadow-2xl border-slate-200 dark:border-slate-800">
+        // Fondo siempre oscuro (sin clases dark:, forzado)
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+            <Card className="w-full max-w-md shadow-2xl bg-slate-900 border-slate-800">
                 <CardHeader className="space-y-1 text-center pb-8">
                     <div className="flex justify-center mb-4">
-                        <div>
-                        {/* <div className="p-3 bg-blue-100 dark:bg-slate-800 rounded-full"> */}
-                            <PackageOpen className="w-10 h-10 text-blue-700 dark:text-blue-500" />
-                        </div>
+                        {/* Logo de INDES */}
+                        <img
+                            src="/INDES-W.png"
+                            alt="INDES Logo"
+                            className="h-20 w-auto object-contain"
+                        />
                     </div>
-                    <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
+                    <CardTitle className="text-2xl font-bold text-white">
                         Sistema de Inventario
                     </CardTitle>
-
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleLogin} className="space-y-6">
 
                         {/* Input Email */}
                         <div className="space-y-2">
-                            <Label htmlFor="email">Correo</Label>
+                            <Label htmlFor="email" className="text-slate-300">Correo</Label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
                                 <Input
                                     id="email"
                                     name="email"
                                     type="email"
                                     placeholder="usuario@indes.sv"
-                                    className="pl-9 bg-slate-50 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                    className="pl-9 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
                                     value={form.email}
                                     onChange={handleChange}
                                     required
@@ -103,15 +101,15 @@ export default function LoginPage() {
 
                         {/* Input Password */}
                         <div className="space-y-2">
-                            <Label htmlFor="password">Contraseña</Label>
+                            <Label htmlFor="password" className="text-slate-300">Contraseña</Label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
                                 <Input
                                     id="password"
                                     name="password"
                                     type="password"
                                     placeholder="••••••••"
-                                    className="pl-9 bg-slate-50 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                                    className="pl-9 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
                                     value={form.password}
                                     onChange={handleChange}
                                     required

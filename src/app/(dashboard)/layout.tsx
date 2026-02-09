@@ -66,8 +66,27 @@ export default function DashboardLayout({
                     </Button>
                 )}
 
-                <div className="max-w-[1600px] mx-auto p-4 md:p-8">
-                    {children}
+                <div className="max-w-[1600px] mx-auto p-4 md:p-8 relative min-h-[calc(100vh-100px)]">
+                    {/* Logo de fondo para todas las vistas */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                        {/* Logo oscuro para modo claro */}
+                        <img
+                            src="/INDES.png"
+                            alt=""
+                            className="w-[70%] max-w-[800px] opacity-[0.06] select-none dark:hidden"
+                        />
+                        {/* Logo blanco para modo oscuro */}
+                        <img
+                            src="/INDES-W.png"
+                            alt=""
+                            className="w-[70%] max-w-[800px] opacity-[0.08] select-none hidden dark:block"
+                        />
+                    </div>
+
+                    {/* Contenido de la página */}
+                    <div className="relative z-10">
+                        {children}
+                    </div>
                 </div>
             </main>
         </div>
