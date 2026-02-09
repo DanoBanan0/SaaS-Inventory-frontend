@@ -250,37 +250,34 @@ export default function EmployeesPage() {
                         </TableBody>
                     </Table>
 
-                    {/* --- FOOTER PAGINACIÓN --- */}
-                    <div className="flex items-center justify-end p-4 border-t border-slate-100 bg-slate-50/30 gap-2">
-                        <div className="flex items-center gap-1 mr-4">
-                            <span className="text-xs text-slate-500">
-                                Mostrando {pagination.from || 0} - {pagination.to || 0} de {pagination.total}
-                            </span>
-                        </div>
-
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePageChange(pagination.current_page - 1)}
-                            disabled={pagination.current_page === 1 || loading}
-                            className="h-8 w-8 p-0"
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-
-                        <span className="text-xs font-medium text-slate-700 w-16 text-center">
-                            Pág {pagination.current_page} de {pagination.last_page}
+                    {/* --- FOOTER PAGINACIÓN (Estilo Auditoría) --- */}
+                    <div className="flex items-center justify-between sm:justify-end p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 gap-2">
+                        <span className="hidden sm:inline text-xs text-slate-500 dark:text-slate-400 mr-4">
+                            Página <span className="font-medium text-slate-900 dark:text-slate-100">{pagination.current_page}</span> de <span className="font-medium text-slate-900 dark:text-slate-100">{pagination.last_page}</span>
                         </span>
-
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePageChange(pagination.current_page + 1)}
-                            disabled={pagination.current_page === pagination.last_page || loading}
-                            className="h-8 w-8 p-0"
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePageChange(pagination.current_page - 1)}
+                                disabled={pagination.current_page === 1 || loading}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="sm:hidden text-xs font-medium text-slate-700 dark:text-slate-300 min-w-[50px] text-center">
+                                {pagination.current_page} / {pagination.last_page}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePageChange(pagination.current_page + 1)}
+                                disabled={pagination.current_page === pagination.last_page || loading}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
 
                 </CardContent>

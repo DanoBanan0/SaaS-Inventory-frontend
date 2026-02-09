@@ -114,7 +114,7 @@ export default function UnitsPage() {
 
             {/* TABLA */}
             <Card>
-                <CardContent className="p-0">
+                <CardContent className="p-0 overflow-x-auto">
                     <Table>
                         <TableHeader className="bg-slate-100">
                             <TableRow>
