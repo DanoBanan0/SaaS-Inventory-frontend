@@ -31,7 +31,11 @@ export default function DashboardLayout({
 
             <div className="md:hidden fixed top-0 w-full z-50 bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between">
                 <Link href="/dashboard">
-                    <span className="text-white font-bold text-lg">INDES<span className="text-blue-500">INVENTORY</span></span>
+                    <img
+                        src="/INDES-W.png"
+                        alt="INDES Logo"
+                        className="h-8 w-auto"
+                    />
                 </Link>
 
                 <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
