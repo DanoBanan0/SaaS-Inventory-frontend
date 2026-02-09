@@ -70,12 +70,12 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
             if (device.employee) {
                 setUseAssignedName(true);
                 setSignerName(device.employee.name);
-                
+
                 // CAMBIO AQUÍ: Forzamos a que estos campos empiecen VACÍOS
                 // para que tú los escribas manualmente.
-                setUnidad(""); 
-                setCorreo(""); 
-                setTelefono(""); 
+                setUnidad("");
+                setCorreo("");
+                setTelefono("");
             } else {
                 setUseAssignedName(false);
                 setSignerName("");
@@ -108,7 +108,7 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
         }
         if (numbers.length > 2) return;
         const numValue = parseInt(numbers, 10);
-        if (numValue > max) return; 
+        if (numValue > max) return;
 
         setter(numbers);
     };
@@ -144,22 +144,22 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="!max-w-[95vw] !w-[95vw] h-[90vh] overflow-hidden flex flex-col p-0 sm:rounded-xl">
 
-                <DialogHeader className="p-4 border-b bg-white z-10">
-                    <DialogTitle className="flex items-center gap-2 text-xl">
+                <DialogHeader className="p-4 border-b bg-white dark:bg-slate-900 z-10">
+                    <DialogTitle className="flex items-center gap-2 text-xl text-slate-900 dark:text-white">
                         <Printer className="w-6 h-6 text-blue-600" />
                         Configurar Acta de Entrega / Soporte
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="flex flex-1 overflow-hidden bg-slate-100">
+                <div className="flex flex-1 overflow-hidden bg-slate-100 dark:bg-slate-950">
 
                     {/* COLUMNA IZQUIERDA: FORMULARIO */}
-                    <div className="w-[30%] min-w-[380px] p-6 overflow-y-auto border-r bg-white h-full shadow-lg z-10">
+                    <div className="w-[30%] min-w-[380px] p-6 overflow-y-auto border-r bg-white dark:bg-slate-900 dark:border-slate-800 h-full shadow-lg z-10">
                         <div className="space-y-8 pb-8">
 
                             {/* --- TIEMPOS --- */}
-                            <fieldset className="border border-slate-200 p-5 rounded-lg bg-slate-50/50">
-                                <legend className="text-sm font-bold text-slate-700 px-2 flex items-center mb-2">
+                            <fieldset className="border border-slate-200 dark:border-slate-700 p-5 rounded-lg bg-slate-50/50 dark:bg-slate-800/50">
+                                <legend className="text-sm font-bold text-slate-700 dark:text-slate-200 px-2 flex items-center mb-2">
                                     <CalendarIcon className="w-4 h-4 mr-2 text-blue-500" /> Tiempos
                                 </legend>
 
@@ -196,20 +196,20 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                                         <div>
                                             <Label className="text-xs font-semibold text-slate-500 mb-2 block">Hora Recibido</Label>
                                             <div className="flex gap-2 items-center">
-                                                <Input 
-                                                    className="bg-white h-10 w-12 text-center p-0 text-sm" 
-                                                    value={hRecibido} 
-                                                    onChange={e => handleTimeChange(e.target.value, setHRecibido, 12)} 
+                                                <Input
+                                                    className="bg-white h-10 w-12 text-center p-0 text-sm"
+                                                    value={hRecibido}
+                                                    onChange={e => handleTimeChange(e.target.value, setHRecibido, 12)}
                                                     onBlur={(e) => handleTimeBlur(e.target.value, setHRecibido)}
-                                                    maxLength={2} 
+                                                    maxLength={2}
                                                 />
                                                 <span className="text-slate-400 font-bold">:</span>
-                                                <Input 
-                                                    className="bg-white h-10 w-12 text-center p-0 text-sm" 
-                                                    value={mRecibido} 
-                                                    onChange={e => handleTimeChange(e.target.value, setMRecibido, 59)} 
+                                                <Input
+                                                    className="bg-white h-10 w-12 text-center p-0 text-sm"
+                                                    value={mRecibido}
+                                                    onChange={e => handleTimeChange(e.target.value, setMRecibido, 59)}
                                                     onBlur={(e) => handleTimeBlur(e.target.value, setMRecibido)}
-                                                    maxLength={2} 
+                                                    maxLength={2}
                                                 />
                                                 <Select value={ampmRecibido} onValueChange={setAmpmRecibido}>
                                                     <SelectTrigger className="h-10 w-[70px] bg-white text-sm px-2">
@@ -256,20 +256,20 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                                         <div>
                                             <Label className="text-xs font-semibold text-slate-500 mb-2 block">Hora Entrega</Label>
                                             <div className="flex gap-2 items-center">
-                                                <Input 
-                                                    className="bg-white h-10 w-12 text-center p-0 text-sm" 
-                                                    value={hEntrega} 
-                                                    onChange={e => handleTimeChange(e.target.value, setHEntrega, 12)} 
+                                                <Input
+                                                    className="bg-white h-10 w-12 text-center p-0 text-sm"
+                                                    value={hEntrega}
+                                                    onChange={e => handleTimeChange(e.target.value, setHEntrega, 12)}
                                                     onBlur={(e) => handleTimeBlur(e.target.value, setHEntrega)}
-                                                    maxLength={2} 
+                                                    maxLength={2}
                                                 />
                                                 <span className="text-slate-400 font-bold">:</span>
-                                                <Input 
-                                                    className="bg-white h-10 w-12 text-center p-0 text-sm" 
-                                                    value={mEntrega} 
-                                                    onChange={e => handleTimeChange(e.target.value, setMEntrega, 59)} 
+                                                <Input
+                                                    className="bg-white h-10 w-12 text-center p-0 text-sm"
+                                                    value={mEntrega}
+                                                    onChange={e => handleTimeChange(e.target.value, setMEntrega, 59)}
                                                     onBlur={(e) => handleTimeBlur(e.target.value, setMEntrega)}
-                                                    maxLength={2} 
+                                                    maxLength={2}
                                                 />
                                                 <Select value={ampmEntrega} onValueChange={setAmpmEntrega}>
                                                     <SelectTrigger className="h-10 w-[70px] bg-white text-sm px-2">
@@ -287,12 +287,12 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                             </fieldset>
 
                             {/* --- FIRMANTE --- */}
-                            <fieldset className="border border-slate-200 p-5 rounded-lg bg-slate-50/50">
-                                <legend className="text-sm font-bold text-slate-700 px-2 flex items-center mb-2">
+                            <fieldset className="border border-slate-200 dark:border-slate-700 p-5 rounded-lg bg-slate-50/50 dark:bg-slate-800/50">
+                                <legend className="text-sm font-bold text-slate-700 dark:text-slate-200 px-2 flex items-center mb-2">
                                     <User className="w-4 h-4 mr-2 text-blue-500" /> Datos del Firmante
                                 </legend>
                                 {device?.employee && (
-                                    <div className="flex items-start space-x-3 bg-blue-50 p-3 border border-blue-100 rounded-md mb-4">
+                                    <div className="flex items-start space-x-3 bg-blue-50 dark:bg-blue-900/30 p-3 border border-blue-100 dark:border-blue-800 rounded-md mb-4">
                                         <Checkbox
                                             id="useAssignee"
                                             checked={useAssignedName}
@@ -306,7 +306,7 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                                                 }
                                             }}
                                         />
-                                        <Label htmlFor="useAssignee" className="cursor-pointer text-sm font-medium text-blue-900 leading-tight pt-0.5">
+                                        <Label htmlFor="useAssignee" className="cursor-pointer text-sm font-medium text-blue-900 dark:text-blue-100 leading-tight pt-0.5">
                                             ¿Firma: <strong>{device.employee.name}</strong>?
                                         </Label>
                                     </div>
@@ -315,7 +315,7 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                                 <div className="space-y-4">
                                     <div>
                                         <Label className="text-xs font-semibold text-slate-500 mb-2 block">Nombre Completo</Label>
-                                        <Input value={signerName} onChange={e => { setSignerName(e.target.value); setUseAssignedName(false); }} className="bg-white h-10"/>
+                                        <Input value={signerName} onChange={e => { setSignerName(e.target.value); setUseAssignedName(false); }} className="bg-white h-10" />
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
@@ -339,8 +339,8 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                             </fieldset>
 
                             {/* --- EQUIPO --- */}
-                            <fieldset className="border border-slate-200 p-5 rounded-lg bg-slate-50/50">
-                                <legend className="text-sm font-bold text-slate-700 px-2 flex items-center mb-2">
+                            <fieldset className="border border-slate-200 dark:border-slate-700 p-5 rounded-lg bg-slate-50/50 dark:bg-slate-800/50">
+                                <legend className="text-sm font-bold text-slate-700 dark:text-slate-200 px-2 flex items-center mb-2">
                                     <Laptop className="w-4 h-4 mr-2 text-blue-500" /> Equipo
                                 </legend>
                                 <div>
@@ -359,7 +359,7 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
                         </div>
 
                         <div className="flex-1 w-full flex items-start justify-center overflow-y-auto pb-20">
-                            <div className="transform scale-[0.85] origin-top shadow-2xl border border-gray-300 bg-white">
+                            <div className="transform scale-[0.85] origin-top shadow-2xl border border-gray-300" style={{ backgroundColor: '#ffffff' }}>
                                 <TechSupportReport ref={componentRef} data={reportData} />
                             </div>
                         </div>
@@ -367,7 +367,7 @@ export function PrintReportDialog({ open, onOpenChange, device }: PrintReportDia
 
                 </div>
 
-                <DialogFooter className="p-4 border-t bg-white z-20">
+                <DialogFooter className="p-4 border-t bg-white dark:bg-slate-900 dark:border-slate-800 z-20">
                     <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
                     <Button onClick={() => handlePrint()} className="bg-blue-700 hover:bg-blue-800 gap-2 px-8 shadow-lg shadow-blue-900/20">
                         <Printer className="w-4 h-4" />

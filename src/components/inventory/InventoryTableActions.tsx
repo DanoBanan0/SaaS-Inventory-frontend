@@ -2,99 +2,135 @@
 
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
-import { useReactToPrint } from "react-to-print";
 import { format } from "date-fns";
-import React from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-interface InventoryTableActionsProps {
-    tableRef: React.RefObject<HTMLDivElement | null>;
-    data: any[];
-    categoryName: string;
+interface CategoryField {
+    key: string;
+    label: string;
 }
 
-export function InventoryTableActions({ tableRef, categoryName }: InventoryTableActionsProps) {
+interface InventoryTableActionsProps {
+    data: any[];
+    categoryName: string;
+    categoryFields?: CategoryField[];
+}
 
-    const handlePrintTable = useReactToPrint({
-        contentRef: tableRef,
-        documentTitle: `Inventario_${categoryName}_${format(new Date(), "dd-MM-yyyy")}`,
-        pageStyle: `
-            @page { 
-                size: landscape; 
-                margin: 8mm; 
-            }
-            @media print {
-                html, body {
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                }
-                
-                /* Escalar contenedor para que quepa */
-                .print-container {
-                    width: 100% !important;
-                    transform: scale(0.85);
-                    transform-origin: top left;
-                }
-                
-                /* Tabla */
-                table {
-                    width: 100% !important;
-                    table-layout: auto !important;
-                    font-size: 9px !important;
-                    border-collapse: collapse !important;
-                }
-                
-                th, td {
-                    padding: 4px 5px !important;
-                    font-size: 9px !important;
-                    white-space: nowrap !important;
-                    border: 1px solid #cbd5e1 !important;
-                }
-                
-                th {
-                    background-color: #e2e8f0 !important;
-                    font-weight: 700 !important;
-                    text-transform: uppercase !important;
-                    font-size: 8px !important;
-                }
-                
-                /* Ocultar columna de acciones */
-                .actions-cell, 
-                th:last-child, 
-                td:last-child {
-                    display: none !important;
-                }
-                
-                /* Badges como texto plano */
-                .badge, [class*="badge"], [class*="Badge"] {
-                    background: none !important;
-                    border: none !important;
-                    padding: 0 !important;
-                    font-size: 9px !important;
-                    color: #374151 !important;
-                    font-weight: normal !important;
-                }
-                
-                /* Ocultar elementos innecesarios */
-                button, .no-print, nav, header {
-                    display: none !important;
-                }
-                
-                /* Scroll container visible */
-                [class*="overflow"] {
-                    overflow: visible !important;
-                }
-            }
-        `,
-    });
+export function InventoryTableActions({ data, categoryName, categoryFields = [] }: InventoryTableActionsProps) {
+
+    const handlePrintTable = () => {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const filename = `Inventario_${categoryName}_${format(new Date(), "dd-MM-yyyy")}`;
+
+        // Título del documento
+        doc.setFontSize(18);
+        doc.setTextColor(30, 64, 175); // Azul
+        doc.text(`INVENTARIO - ${categoryName.toUpperCase()}`, 14, 15);
+
+        // Fecha de generación
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generado: ${new Date().toLocaleString('es-SV')}`, 14, 22);
+
+        // Construir headers dinámicamente
+        const baseHeaders = [
+            'Nombre',
+            'Unidad',
+            'Cód. Inventario',
+            'Marca',
+            'Modelo',
+            'Serial',
+        ];
+        const dynamicHeaders = categoryFields.map(f => f.label);
+        const finalHeaders = [
+            ...baseHeaders,
+            ...dynamicHeaders,
+            'Comentario',
+            'Última Edición'
+        ];
+
+        // Preparar datos de la tabla
+        const tableData = data.map(device => {
+            const baseRow = [
+                device.employee?.name || '-- Sin Asignar --',
+                device.employee?.unit?.name || '-',
+                device.inventory_code || '',
+                device.brand || '',
+                device.model || '',
+                device.serial_number || '',
+            ];
+
+            // Agregar campos dinámicos
+            const dynamicData = categoryFields.map(field =>
+                device.specs?.[field.key] || '-'
+            );
+
+            // Agregar comentarios y fecha
+            const endData = [
+                device.comments || '-',
+                device.updated_at
+                    ? new Date(device.updated_at).toLocaleString('es-SV', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    })
+                    : '-',
+            ];
+
+            return [...baseRow, ...dynamicData, ...endData];
+        });
+
+        // Generar tabla con autoTable
+        autoTable(doc, {
+            head: [finalHeaders],
+            body: tableData,
+            startY: 28,
+            styles: {
+                fontSize: 8,
+                cellPadding: 2,
+                overflow: 'linebreak',
+            },
+            headStyles: {
+                fillColor: [30, 64, 175],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 7,
+            },
+            alternateRowStyles: {
+                fillColor: [245, 247, 250],
+            },
+            columnStyles: {
+                0: { cellWidth: 'auto' }, // Nombre
+                6: { cellWidth: 'auto' }, // Comentario (puede ser largo)
+            },
+            margin: { top: 28, right: 10, bottom: 10, left: 10 },
+            tableWidth: 'auto',
+        });
+
+        // Abrir PDF en nueva ventana para imprimir
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const printWindow = window.open(pdfUrl);
+
+        if (printWindow) {
+            printWindow.onload = () => {
+                printWindow.print();
+            };
+        }
+    };
 
     return (
         <Button
             variant="outline"
             size="sm"
             className="h-8 gap-2 bg-white hover:bg-slate-50 text-slate-700 border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
-            onClick={() => handlePrintTable()}
+            onClick={handlePrintTable}
+            disabled={data.length === 0}
         >
             <Printer className="h-4 w-4 text-blue-600" />
             <span className="hidden sm:inline">Imprimir</span>

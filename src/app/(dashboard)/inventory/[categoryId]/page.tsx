@@ -174,15 +174,14 @@ export default function CategoryDetailPage() {
                 <div className="flex items-center gap-2">
                     <ExportButton
                         data={devices}
-                        columns={['inventory_code', 'brand', 'model', 'serial_number', 'status']}
-                        headers={['N° Inventario', 'Marca', 'Modelo', 'Serie', 'Estado']}
                         filename={`inventario_${category?.name || 'dispositivos'}`}
                         disabled={loading}
+                        categoryFields={category?.fields || []}
                     />
                     <InventoryTableActions
-                        tableRef={tableRef}
                         data={devices}
                         categoryName={category?.name || "Inventario"}
+                        categoryFields={category?.fields || []}
                     />
 
                     <TooltipProvider>

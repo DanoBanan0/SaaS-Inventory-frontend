@@ -18,25 +18,92 @@ export interface ReportData {
     observaciones: string;
 }
 
+// Estilos inline para asegurar que siempre se vea en modo claro
+const styles = {
+    container: {
+        width: '216mm',
+        minHeight: '279mm',
+        padding: '12mm',
+        fontFamily: 'Arial, sans-serif',
+        backgroundColor: '#ffffff',
+        color: '#000000',
+        colorScheme: 'light' as const,
+        boxSizing: 'border-box' as const,
+    },
+    header: {
+        color: '#002060',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        lineHeight: '1.2',
+    },
+    subHeader: {
+        color: '#000000',
+        fontWeight: 'bold',
+        fontSize: '11px',
+        textTransform: 'uppercase' as const,
+    },
+    sectionHeader: {
+        backgroundColor: '#d9d9d9',
+        color: '#000000',
+        fontWeight: 'bold',
+        fontSize: '11px',
+        padding: '4px 0',
+        textAlign: 'center' as const,
+        borderBottom: '1px solid #000000',
+    },
+    sectionBorder: {
+        border: '1px solid #000000',
+        marginBottom: '16px',
+    },
+    label: {
+        fontSize: '11px',
+        fontWeight: 500,
+        color: '#000000',
+        marginRight: '4px',
+        whiteSpace: 'nowrap' as const,
+    },
+    underline: {
+        flex: 1,
+        borderBottom: '1px solid #000000',
+        textAlign: 'center' as const,
+        fontSize: '11px',
+        paddingLeft: '8px',
+        paddingRight: '8px',
+        lineHeight: '1',
+        paddingBottom: '2px',
+        fontWeight: 500,
+        color: '#000000',
+    },
+    tableCell: {
+        border: '1px solid #000000',
+        padding: '4px',
+        fontSize: '10px',
+        color: '#000000',
+        textAlign: 'center' as const,
+    },
+    tableCellHeader: {
+        border: '1px solid #000000',
+        padding: '4px',
+        fontSize: '10px',
+        fontWeight: 'bold',
+        fontStyle: 'italic' as const,
+        color: '#000000',
+        textAlign: 'center' as const,
+    },
+};
+
 export const TechSupportReport = React.forwardRef<HTMLDivElement, { data: ReportData }>(
     ({ data }, ref) => {
 
-        // Helper para campos subrayados
         const UnderlinedField = ({ label, value, className = "" }: { label: string, value: string, className?: string }) => (
             <div className={`flex items-end ${className}`}>
-                <span className="text-[11px] mr-1 whitespace-nowrap font-medium text-black">{label}</span>
-                <div className="flex-1 border-b border-black text-center text-[11px] px-2 leading-none pb-0.5 font-medium text-black">
-                    {value}
-                </div>
+                <span style={styles.label}>{label}</span>
+                <div style={styles.underline}>{value}</div>
             </div>
         );
 
         return (
-            <div
-                ref={ref}
-                className="w-[216mm] min-h-[279mm] p-[12mm] bg-white text-black font-sans mx-auto box-border"
-                style={{ fontFamily: 'Arial, sans-serif' }}
-            >
+            <div ref={ref} style={styles.container} className="mx-auto">
                 {/* --- ENCABEZADO --- */}
                 <div className="flex justify-between items-start mb-6 h-20">
                     <div className="w-24 h-20 flex items-center justify-start">
@@ -44,10 +111,10 @@ export const TechSupportReport = React.forwardRef<HTMLDivElement, { data: Report
                     </div>
 
                     <div className="flex-1 px-4 text-center pt-2">
-                        <h1 className="font-bold text-[14px] leading-tight text-[#002060]">
+                        <h1 style={styles.header}>
                             INSTITUTO NACIONAL DE LOS DEPORTES DE EL SALVADOR
                         </h1>
-                        <h2 className="font-bold text-[11px] mt-1 text-black uppercase">
+                        <h2 style={{ ...styles.subHeader, marginTop: '4px' }}>
                             UNIDAD DE TECNOLOGÍAS DE INFORMACIÓN- SOPORTE TÉCNICO
                         </h2>
                     </div>
@@ -63,8 +130,8 @@ export const TechSupportReport = React.forwardRef<HTMLDivElement, { data: Report
                         <UnderlinedField label="Fecha de Recibido:" value={data.fechaRecibido} className="w-[30%]" />
                         <UnderlinedField label="Fecha de Entrega:" value={data.fechaEntrega} className="w-[30%]" />
                         <div className="flex-1 flex justify-end items-end">
-                            <span className="text-[11px] mr-1 font-medium">No Reporte:</span>
-                            <div className="w-20 border-b border-black text-center text-[11px] leading-none pb-0.5">
+                            <span style={styles.label}>No Reporte:</span>
+                            <div style={{ ...styles.underline, width: '80px', flex: 'none' }}>
                                 {data.noReporte}
                             </div>
                         </div>
@@ -77,8 +144,8 @@ export const TechSupportReport = React.forwardRef<HTMLDivElement, { data: Report
                 </div>
 
                 {/* --- SECCIÓN 2: DATOS DEL USUARIO --- */}
-                <div className="border border-black mb-4">
-                    <div className="bg-[#d9d9d9] text-center font-bold text-[11px] py-1 border-b border-black text-black">
+                <div style={styles.sectionBorder}>
+                    <div style={styles.sectionHeader}>
                         Datos del Usuario
                     </div>
                     <div className="p-2 space-y-2">
@@ -94,36 +161,35 @@ export const TechSupportReport = React.forwardRef<HTMLDivElement, { data: Report
                 </div>
 
                 {/* --- SECCIÓN 3: DESCRIPCIÓN DEL EQUIPO --- */}
-                <div className="border border-black mb-4">
-                    <div className="bg-[#d9d9d9] text-center font-bold text-[11px] py-1 border-b border-black text-black">
+                <div style={styles.sectionBorder}>
+                    <div style={styles.sectionHeader}>
                         Descripción del Equipo (Si Aplica)
                     </div>
-                    <table className="w-full border-collapse text-[10px]">
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
-                            <tr className="text-center font-bold italic">
-                                <th className="border-r border-black p-1 w-[20%] font-bold">Equipo</th>
-                                <th className="border-r border-black p-1 w-[20%] font-bold">Marca</th>
-                                <th className="border-r border-black p-1 w-[20%] font-bold">Modelo</th>
-                                <th className="border-r border-black p-1 w-[20%] font-bold">Serie</th>
-                                <th className="p-1 w-[20%] font-bold">Código Activo</th>
+                            <tr>
+                                <th style={{ ...styles.tableCellHeader, width: '20%', borderTop: 'none' }}>Equipo</th>
+                                <th style={{ ...styles.tableCellHeader, width: '20%', borderTop: 'none', borderLeft: 'none' }}>Marca</th>
+                                <th style={{ ...styles.tableCellHeader, width: '20%', borderTop: 'none', borderLeft: 'none' }}>Modelo</th>
+                                <th style={{ ...styles.tableCellHeader, width: '20%', borderTop: 'none', borderLeft: 'none' }}>Serie</th>
+                                <th style={{ ...styles.tableCellHeader, width: '20%', borderTop: 'none', borderLeft: 'none' }}>Código Activo</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="border-t border-black h-[1px]"></tr>
-                            <tr className="text-center h-6">
-                                <td className="border-r border-black p-1 border-b border-black">{data.tipoEquipo}</td>
-                                <td className="border-r border-black p-1 border-b border-black">{data.marca}</td>
-                                <td className="border-r border-black p-1 border-b border-black">{data.modelo}</td>
-                                <td className="border-r border-black p-1 border-b border-black">{data.serie}</td>
-                                <td className="p-1 border-b border-black">{data.codigoActivo}</td>
+                            <tr style={{ height: '24px' }}>
+                                <td style={{ ...styles.tableCell, borderTop: 'none' }}>{data.tipoEquipo}</td>
+                                <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}>{data.marca}</td>
+                                <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}>{data.modelo}</td>
+                                <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}>{data.serie}</td>
+                                <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}>{data.codigoActivo}</td>
                             </tr>
                             {[1, 2, 3, 4].map((i) => (
-                                <tr key={i} className="h-6">
-                                    <td className="border-r border-black border-b border-black"></td>
-                                    <td className="border-r border-black border-b border-black"></td>
-                                    <td className="border-r border-black border-b border-black"></td>
-                                    <td className="border-r border-black border-b border-black"></td>
-                                    <td className="border-b border-black"></td>
+                                <tr key={i} style={{ height: '24px' }}>
+                                    <td style={{ ...styles.tableCell, borderTop: 'none' }}></td>
+                                    <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}></td>
+                                    <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}></td>
+                                    <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}></td>
+                                    <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -131,23 +197,23 @@ export const TechSupportReport = React.forwardRef<HTMLDivElement, { data: Report
                 </div>
 
                 {/* --- SECCIÓN 4: DIAGNÓSTICO --- */}
-                <div className="border border-black mb-2">
-                    <div className="bg-[#d9d9d9] text-center font-bold text-[11px] py-1 border-b border-black text-black">
+                <div style={{ ...styles.sectionBorder, marginBottom: '8px' }}>
+                    <div style={styles.sectionHeader}>
                         Diagnostico :
                     </div>
-                    <table className="w-full border-collapse text-[10px]">
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
-                            <tr className="text-center">
-                                <th className="border-r border-black p-1 w-[33%] font-normal">Falla</th>
-                                <th className="border-r border-black p-1 w-[33%] font-normal">Causa</th>
-                                <th className="p-1 w-[34%] font-normal">Solución</th>
+                            <tr>
+                                <th style={{ ...styles.tableCell, width: '33%', fontWeight: 'normal', borderTop: 'none' }}>Falla</th>
+                                <th style={{ ...styles.tableCell, width: '33%', fontWeight: 'normal', borderTop: 'none', borderLeft: 'none' }}>Causa</th>
+                                <th style={{ ...styles.tableCell, width: '34%', fontWeight: 'normal', borderTop: 'none', borderLeft: 'none' }}>Solución</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="border-t border-black h-24">
-                                <td className="border-r border-black"></td>
-                                <td className="border-r border-black"></td>
-                                <td></td>
+                            <tr style={{ height: '96px' }}>
+                                <td style={{ ...styles.tableCell, borderTop: 'none' }}></td>
+                                <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}></td>
+                                <td style={{ ...styles.tableCell, borderTop: 'none', borderLeft: 'none' }}></td>
                             </tr>
                         </tbody>
                     </table>
@@ -155,35 +221,33 @@ export const TechSupportReport = React.forwardRef<HTMLDivElement, { data: Report
 
                 {/* --- SECCIÓN 5: OBSERVACIONES --- */}
                 <div className="mb-8">
-                    <div className="font-bold text-[11px] mb-1">Observaciones Generales :</div>
-                    <div className="border border-black h-24 p-2 text-[11px]">
+                    <div style={{ fontWeight: 'bold', fontSize: '11px', marginBottom: '4px', color: '#000000' }}>Observaciones Generales :</div>
+                    <div style={{ border: '1px solid #000000', height: '96px', padding: '8px', fontSize: '11px', color: '#000000' }}>
                         {data.observaciones}
                     </div>
                 </div>
 
                 {/* --- SECCIÓN 6: FIRMAS --- */}
-                {/* CORRECCIÓN AQUÍ: Usamos items-start en lugar de items-end */}
                 <div className="flex justify-between items-start mt-16 px-2">
-
                     {/* Firma Izquierda */}
                     <div className="w-[40%] flex flex-col items-center text-center">
-                        <div className="w-full border-t border-black mb-1"></div>
-                        <div className="font-bold italic text-[11px] text-black">
+                        <div style={{ width: '100%', borderTop: '1px solid #000000', marginBottom: '4px' }}></div>
+                        <div style={{ fontWeight: 'bold', fontStyle: 'italic', fontSize: '11px', color: '#000000' }}>
                             Unidad Solicitante
                         </div>
-                        <div className="text-[10px]">Firma y Sello</div>
+                        <div style={{ fontSize: '10px', color: '#000000' }}>Firma y Sello</div>
                     </div>
 
                     {/* Firma Derecha */}
                     <div className="w-[45%] flex flex-col items-center text-center">
-                        <div className="w-full border-t border-black mb-1"></div>
-                        <div className="w-full text-center text-[10px]">
-                            <span className="font-bold">Nombre:</span> Ing. Lilian Aracely Santos Aquino
+                        <div style={{ width: '100%', borderTop: '1px solid #000000', marginBottom: '4px' }}></div>
+                        <div style={{ width: '100%', textAlign: 'center', fontSize: '10px', color: '#000000' }}>
+                            <span style={{ fontWeight: 'bold' }}>Nombre:</span> Ing. Lilian Aracely Santos Aquino
                         </div>
-                        <div className="w-full font-bold italic text-[11px] text-black mt-0.5">
+                        <div style={{ width: '100%', fontWeight: 'bold', fontStyle: 'italic', fontSize: '11px', color: '#000000', marginTop: '2px' }}>
                             Técnico de Soporte UTI-INDES
                         </div>
-                        <div className="w-full text-[10px] mt-0.5">
+                        <div style={{ width: '100%', fontSize: '10px', marginTop: '2px', color: '#000000' }}>
                             Firma y Sello
                         </div>
                     </div>
