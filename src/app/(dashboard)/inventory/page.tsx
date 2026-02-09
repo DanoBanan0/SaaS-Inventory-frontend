@@ -11,11 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { CreateCategoryDialog } from "@/components/inventory/CreateCategoryDialog";
 import { canManageSystem } from "@/lib/permissions";
 import { useAuth } from "@/hooks/useAuth";
-
-interface Category {
-    id: string;
-    name: string;
-}
+import { Category } from "@/types";
 
 export default function InventoryPage() {
     const router = useRouter();

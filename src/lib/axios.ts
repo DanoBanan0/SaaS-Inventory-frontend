@@ -24,6 +24,8 @@ api.interceptors.response.use(
             if (window.location.pathname !== '/login') {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                // Eliminar cookie de autenticación
+                document.cookie = "auth_token=; path=/; max-age=0";
 
                 Swal.fire({
                     icon: 'warning',

@@ -86,8 +86,11 @@ export default function Sidebar({ className, onNavigate, onCollapse }: SidebarPr
             confirmButtonText: "Salir",
         }).then((result) => {
             if (result.isConfirmed) {
+                // Eliminar de localStorage
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
+                // Eliminar cookie de autenticación
+                document.cookie = "auth_token=; path=/; max-age=0";
                 router.push("/login");
             }
         });

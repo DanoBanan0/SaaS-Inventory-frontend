@@ -6,6 +6,7 @@ import { Menu, PanelLeftOpen } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function DashboardLayout({
     children,
@@ -29,9 +30,9 @@ export default function DashboardLayout({
 
 
             <div className="md:hidden fixed top-0 w-full z-50 bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between">
-                <a href="https://inventory-frontend-kappa-ashy.vercel.app/dashboard">
+                <Link href="/dashboard">
                     <span className="text-white font-bold text-lg">INDES<span className="text-blue-500">INVENTORY</span></span>
-                </a>
+                </Link>
 
                 <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                     <SheetTrigger asChild>

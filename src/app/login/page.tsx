@@ -30,8 +30,13 @@ export default function LoginPage() {
         try {
             const response = await api.post("/auth/login", form);
             const { access_token, user } = response.data;
+
+            // Guardar en localStorage
             localStorage.setItem("token", access_token);
             localStorage.setItem("user", JSON.stringify(user));
+
+            // Guardar como cookie para el middleware de autenticación
+            document.cookie = `auth_token=${access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
 
             Swal.fire({
                 icon: "success",
