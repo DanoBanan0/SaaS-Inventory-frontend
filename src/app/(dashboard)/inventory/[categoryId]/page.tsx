@@ -278,6 +278,7 @@ export default function CategoryDetailPage() {
                                     <TableHead className="font-bold text-slate-700">Estado</TableHead>
                                     <TableHead className="font-bold text-slate-700 w-[200px]">Comentario</TableHead>
                                     <TableHead className="font-bold text-slate-700 whitespace-nowrap">Última Edición</TableHead>
+                                    <TableHead className="font-bold text-slate-700 whitespace-nowrap">Acciones</TableHead>
                                     <TableHead className="w-[50px] print:hidden"></TableHead>
                                 </TableRow>
                             </TableHeader>
