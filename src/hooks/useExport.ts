@@ -1,6 +1,8 @@
 import { useCallback } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-type ExportFormat = 'csv' | 'excel';
+type ExportFormat = 'csv' | 'excel' | 'pdf';
 
 interface ExportOptions {
     filename: string;
@@ -10,6 +12,56 @@ interface ExportOptions {
 }
 
 export function useExport() {
+    const exportToPDF = useCallback(({ filename, headers, data, columns }: ExportOptions) => {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Título del documento
+        doc.setFontSize(16);
+        doc.setTextColor(30, 64, 175); // Azul
+        doc.text(filename.replace(/_/g, ' ').toUpperCase(), 14, 15);
+
+        // Fecha de generación
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generado: ${new Date().toLocaleString('es-SV')}`, 14, 22);
+
+        // Preparar datos de la tabla
+        const tableData = data.map(row =>
+            columns.map(col => {
+                const value = row[col];
+                if (value === null || value === undefined) return '';
+                if (typeof value === 'object') return value.name || JSON.stringify(value);
+                return String(value);
+            })
+        );
+
+        // Generar tabla con autoTable
+        autoTable(doc, {
+            head: [headers],
+            body: tableData,
+            startY: 28,
+            styles: {
+                fontSize: 9,
+                cellPadding: 3,
+            },
+            headStyles: {
+                fillColor: [30, 64, 175],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+            },
+            alternateRowStyles: {
+                fillColor: [245, 247, 250],
+            },
+            margin: { top: 28, right: 14, bottom: 14, left: 14 },
+        });
+
+        doc.save(`${filename}.pdf`);
+    }, []);
+
     const exportToCSV = useCallback(({ filename, headers, data, columns }: ExportOptions) => {
         const csvHeader = headers.join(',');
         const csvRows = data.map(row =>
@@ -60,5 +112,5 @@ export function useExport() {
         URL.revokeObjectURL(link.href);
     };
 
-    return { exportToCSV, exportToExcel };
+    return { exportToCSV, exportToExcel, exportToPDF };
 }

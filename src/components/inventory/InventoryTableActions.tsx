@@ -20,7 +20,7 @@ export function InventoryTableActions({ tableRef, categoryName }: InventoryTable
         pageStyle: `
             @page { 
                 size: landscape; 
-                margin: 5mm; 
+                margin: 8mm; 
             }
             @media print {
                 html, body {
@@ -30,37 +30,33 @@ export function InventoryTableActions({ tableRef, categoryName }: InventoryTable
                     padding: 0 !important;
                 }
                 
-                /* Escalar todo el contenedor para que quepa */
+                /* Escalar contenedor para que quepa */
                 .print-container {
                     width: 100% !important;
-                    transform: scale(0.75);
+                    transform: scale(0.85);
                     transform-origin: top left;
                 }
                 
-                /* Tabla compacta */
+                /* Tabla */
                 table {
                     width: 100% !important;
                     table-layout: auto !important;
-                    font-size: 7px !important;
+                    font-size: 9px !important;
                     border-collapse: collapse !important;
                 }
                 
                 th, td {
-                    padding: 2px 3px !important;
-                    font-size: 7px !important;
+                    padding: 4px 5px !important;
+                    font-size: 9px !important;
                     white-space: nowrap !important;
-                    border: 0.5px solid #cbd5e1 !important;
-                    max-width: 100px !important;
-                    overflow: hidden !important;
-                    text-overflow: ellipsis !important;
+                    border: 1px solid #cbd5e1 !important;
                 }
                 
                 th {
                     background-color: #e2e8f0 !important;
                     font-weight: 700 !important;
                     text-transform: uppercase !important;
-                    font-size: 6px !important;
-                    letter-spacing: 0.3px !important;
+                    font-size: 8px !important;
                 }
                 
                 /* Ocultar columna de acciones */
@@ -70,10 +66,14 @@ export function InventoryTableActions({ tableRef, categoryName }: InventoryTable
                     display: none !important;
                 }
                 
-                /* Badges más compactos */
-                .badge, [class*="badge"] {
-                    font-size: 6px !important;
-                    padding: 1px 2px !important;
+                /* Badges como texto plano */
+                .badge, [class*="badge"], [class*="Badge"] {
+                    background: none !important;
+                    border: none !important;
+                    padding: 0 !important;
+                    font-size: 9px !important;
+                    color: #374151 !important;
+                    font-weight: normal !important;
                 }
                 
                 /* Ocultar elementos innecesarios */

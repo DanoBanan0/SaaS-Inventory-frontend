@@ -7,7 +7,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, FileType } from "lucide-react";
 import { useExport } from "@/hooks/useExport";
 
 interface ExportButtonProps {
@@ -19,14 +19,16 @@ interface ExportButtonProps {
 }
 
 export function ExportButton({ data, columns, headers, filename, disabled }: ExportButtonProps) {
-    const { exportToCSV, exportToExcel } = useExport();
+    const { exportToCSV, exportToExcel, exportToPDF } = useExport();
 
-    const handleExport = (format: 'csv' | 'excel') => {
+    const handleExport = (format: 'csv' | 'excel' | 'pdf') => {
         const options = { filename, headers, data, columns };
         if (format === 'csv') {
             exportToCSV(options);
-        } else {
+        } else if (format === 'excel') {
             exportToExcel(options);
+        } else {
+            exportToPDF(options);
         }
     };
 
@@ -52,7 +54,12 @@ export function ExportButton({ data, columns, headers, filename, disabled }: Exp
                     <FileText className="h-4 w-4 text-blue-600" />
                     CSV (.csv)
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('pdf')} className="gap-2 cursor-pointer">
+                    <FileType className="h-4 w-4 text-red-600" />
+                    PDF (.pdf)
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
 }
+
