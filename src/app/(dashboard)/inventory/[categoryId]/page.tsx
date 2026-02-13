@@ -55,7 +55,8 @@ export default function CategoryDetailPage() {
     const [statusFilter, setStatusFilter] = useState("all");
     const [unitFilter, setUnitFilter] = useState("");
     const [units, setUnits] = useState<any[]>([]);
-    const [dateFilter, setDateFilter] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
     const [isPrintOpen, setIsPrintOpen] = useState(false);
     const [printDevice, setPrintDevice] = useState<any>(null);
 
@@ -87,7 +88,8 @@ export default function CategoryDetailPage() {
             if (searchText) params.append('search', searchText);
             if (statusFilter !== 'all') params.append('status', statusFilter);
             if (unitFilter) params.append('unit', unitFilter);
-            if (dateFilter) params.append('date', dateFilter);
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo) params.append('date_to', dateTo);
 
             const devRes = await api.get(`/devices?${params.toString()}`);
 
@@ -108,7 +110,7 @@ export default function CategoryDetailPage() {
         } finally {
             setLoading(false);
         }
-    }, [categoryId, searchText, statusFilter, unitFilter, dateFilter, category]);
+    }, [categoryId, searchText, statusFilter, unitFilter, dateFrom, dateTo, category]);
 
     // --- CAMBIO: Función para cambiar página ---
     const handlePageChange = (newPage: number) => {
@@ -123,7 +125,7 @@ export default function CategoryDetailPage() {
             if (categoryId) fetchData(1);
         }, 300);
         return () => clearTimeout(timer);
-    }, [fetchData, categoryId, searchText, statusFilter, unitFilter, dateFilter]); // Agregados filtros a dependencias
+    }, [fetchData, categoryId, searchText, statusFilter, unitFilter, dateFrom, dateTo]); // Agregados filtros a dependencias
 
     // Carga de Unidades
     useEffect(() => {
@@ -144,7 +146,8 @@ export default function CategoryDetailPage() {
         setSearchText("");
         setStatusFilter("all");
         setUnitFilter("");
-        setDateFilter("");
+        setDateFrom("");
+        setDateTo("");
     };
 
     const handleEditClick = (device: any) => {
@@ -226,7 +229,7 @@ export default function CategoryDetailPage() {
                 onSearchChange={setSearchText}
                 searchColSpan="md:col-span-3 lg:col-span-3"
                 clearColSpan="md:col-span-1"
-                hasActiveFilters={!!(searchText || unitFilter || statusFilter !== 'all' || dateFilter)}
+                hasActiveFilters={!!(searchText || unitFilter || statusFilter !== 'all' || dateFrom || dateTo)}
                 onClear={clearFilters}
             >
                 {/* ... (TUS FILTROS SE MANTIENEN IGUAL) ... */}
@@ -254,8 +257,12 @@ export default function CategoryDetailPage() {
                     </Select>
                 </div>
                 <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
-                    <span className="text-xs font-medium text-slate-500 ml-1">Fecha Registro</span>
-                    <Input type="date" className="bg-white w-full" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} />
+                    <span className="text-xs font-medium text-slate-500 ml-1">Desde</span>
+                    <Input type="date" className="bg-white w-full" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+                </div>
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 ml-1">Hasta</span>
+                    <Input type="date" className="bg-white w-full" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
                 </div>
             </DataFilters>
 

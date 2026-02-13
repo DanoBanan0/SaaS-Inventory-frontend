@@ -26,7 +26,8 @@ export default function AuditsPage() {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
-    const [dateFilter, setDateFilter] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
     const { pagination, setPagination, handlePageChange } = usePagination();
 
     const fetchLogs = useCallback(async (page = 1) => {
@@ -35,7 +36,8 @@ export default function AuditsPage() {
             const params = new URLSearchParams();
             params.append('page', page.toString());
             if (searchText) params.append('search', searchText);
-            if (dateFilter) params.append('date', dateFilter);
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo) params.append('date_to', dateTo);
 
             const res = await api.get(`/audits?${params.toString()}`);
             const allLogs = res.data.data || [];
@@ -59,7 +61,7 @@ export default function AuditsPage() {
         } finally {
             setLoading(false);
         }
-    }, [searchText, dateFilter, setPagination]);
+    }, [searchText, dateFrom, dateTo, setPagination]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -70,10 +72,11 @@ export default function AuditsPage() {
 
     const clearFilters = () => {
         setSearchText("");
-        setDateFilter("");
+        setDateFrom("");
+        setDateTo("");
     };
 
-    const hasActiveFilters = !!(searchText || dateFilter);
+    const hasActiveFilters = !!(searchText || dateFrom || dateTo);
 
     return (
         <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
@@ -90,18 +93,27 @@ export default function AuditsPage() {
                 searchValue={searchText}
                 onSearchChange={setSearchText}
                 searchPlaceholder="Buscar por responsable..."
-                searchColSpan="md:col-span-6"
+                searchColSpan="md:col-span-3 lg:col-span-3"
                 hasActiveFilters={hasActiveFilters}
                 onClear={clearFilters}
-                clearColSpan="md:col-span-2"
+                clearColSpan="md:col-span-1"
             >
-                <div className="col-span-1 md:col-span-3 space-y-1">
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 ml-1">Fecha</span>
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 ml-1">Desde</span>
                     <Input
                         type="date"
                         className="bg-white dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 w-full"
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
+                        value={dateFrom}
+                        onChange={(e) => setDateFrom(e.target.value)}
+                    />
+                </div>
+                <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-1">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 ml-1">Hasta</span>
+                    <Input
+                        type="date"
+                        className="bg-white dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 w-full"
+                        value={dateTo}
+                        onChange={(e) => setDateTo(e.target.value)}
                     />
                 </div>
             </DataFilters>
